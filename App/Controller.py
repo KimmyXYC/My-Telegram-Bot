@@ -29,14 +29,6 @@ class BotRunner(object):
         async def delete_command(message):
             await Event.Del_Command(bot, message)
 
-        @bot.message_handler(content_types=['text'])
-        async def delete_message(message):
-            await Event.Del_Message(bot, message)
-
-        @bot.message_handler(content_types=['document'])
-        async def delete_file(message):
-            await Event.Del_File(bot, message)
-
         from telebot import asyncio_filters
         bot.add_custom_filter(asyncio_filters.IsAdminFilter(bot))
         bot.add_custom_filter(asyncio_filters.ChatFilter())
