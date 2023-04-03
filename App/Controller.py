@@ -29,6 +29,11 @@ class BotRunner(object):
         async def delete_command(message):
             await Event.Del_Command(bot, message)
 
+        @bot.inline_handler(lambda query: True)
+        def send_photo(query):
+            await Event.InLine_Message(bot, query)
+
+
         from telebot import asyncio_filters
         bot.add_custom_filter(asyncio_filters.IsAdminFilter(bot))
         bot.add_custom_filter(asyncio_filters.ChatFilter())
