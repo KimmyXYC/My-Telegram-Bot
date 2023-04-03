@@ -3,6 +3,7 @@ from io import BytesIO
 from PIL import Image
 import requests
 import telebot
+import time
 
 
 async def Del_Command(bot, message):
@@ -14,10 +15,11 @@ async def InLine_Message(bot, query):
     response = requests.get(url)
     img = Image.open(BytesIO(response.content))
     width, height = img.size
+    timestamp = int(time.time())
     photo_result = telebot.types.InlineQueryResultPhoto(
         id='1',
-        photo_url='https://api.mahiron.moe/hangzhou.jpg',
-        thumb_url='https://api.mahiron.moe/hangzhou.jpg',
+        photo_url=f'https://api.mahiron.moe/hangzhou.jpg?time={timestamp}',
+        thumb_url=f'https://api.mahiron.moe/hangzhou.jpg?time={timestamp}',
         photo_width=width,
         photo_height=height
     )
