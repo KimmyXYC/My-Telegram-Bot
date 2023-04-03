@@ -11,16 +11,19 @@ async def Del_Command(bot, message):
 
 
 async def InLine_Message(bot, query):
-    url = "https://api.mahiron.moe/hangzhou.jpg"
-    response = requests.get(url)
-    img = Image.open(BytesIO(response.content))
-    width, height = img.size
     timestamp = int(time.time())//300
-    photo_result = telebot.types.InlineQueryResultPhoto(
+    photo_result1 = telebot.types.InlineQueryResultPhoto(
         id='1',
         photo_url=f'https://api.mahiron.moe/hangzhou.jpg?time={timestamp}',
         thumb_url=f'https://api.mahiron.moe/hangzhou.jpg?time={timestamp}',
-        photo_width=width,
-        photo_height=height
+        photo_width=1024,
+        photo_height=900
     )
-    await bot.answer_inline_query(query.id, [photo_result])
+    photo_result2 = telebot.types.InlineQueryResultPhoto(
+        id='2',
+        photo_url=f'https://bili.elaina.pub/biliserver/guangzhou.jpg?time={timestamp}',
+        thumb_url=f'https://bili.elaina.pub/biliserver/guangzhou.jpg?time={timestamp}',
+        photo_width=1024,
+        photo_height=900
+    )
+    await bot.answer_inline_query(query.id, [photo_result1, photo_result2])
