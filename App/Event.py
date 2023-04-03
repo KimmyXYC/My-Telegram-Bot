@@ -15,7 +15,7 @@ async def InLine_Message(bot, query):
     response = requests.get(url)
     img = Image.open(BytesIO(response.content))
     width, height = img.size
-    timestamp = int(time.time())
+    timestamp = int(time.time())//300
     photo_result = telebot.types.InlineQueryResultPhoto(
         id='1',
         photo_url=f'https://api.mahiron.moe/hangzhou.jpg?time={timestamp}',
