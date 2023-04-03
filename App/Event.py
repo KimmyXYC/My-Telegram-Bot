@@ -2,6 +2,7 @@ from asyncio import sleep
 from io import BytesIO
 from PIL import Image
 import requests
+import telebot
 
 
 async def Del_Command(bot, message):
@@ -13,7 +14,7 @@ async def InLine_Message(bot, query):
     response = requests.get(url)
     img = Image.open(BytesIO(response.content))
     width, height = img.size
-    photo_result = bot.types.InlineQueryResultPhoto(
+    photo_result = telebot.types.InlineQueryResultPhoto(
         id='1',
         photo_url='https://api.mahiron.moe/hangzhou.jpg',
         thumb_url='https://api.mahiron.moe/hangzhou.jpg',
