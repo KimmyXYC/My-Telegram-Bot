@@ -1,5 +1,5 @@
 from pathlib import Path
-from utils.Base import ReadConfig
+from Utils.Base import ReadConfig
 from App.Controller import BotRunner
 from loguru import logger
 import sys
@@ -12,6 +12,6 @@ logger.add(sink='run.log',
            rotation="20 MB",
            enqueue=True)
 
-config = ReadConfig().parseFile(str(Path.cwd()) + "/Config/app.toml")
+config = ReadConfig().parse_file(str(Path.cwd()) + "/Config/app.toml")
 App = BotRunner(config)
 App.run()
