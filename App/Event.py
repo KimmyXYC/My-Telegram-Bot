@@ -1,7 +1,26 @@
 import telebot
 import time
+import random
 from loguru import logger
 from Utils.Parameter import get_parameter, save_config
+
+
+async def call_doctor(bot, message):
+    doctor_msg = ""
+    doctor_list = ["👨‍⚕️", "👩‍⚕️", "🚑", "🏥", "💊"]
+    max_repeats = 3
+    consecutive_count = 0
+    for i in range(random.randint(20, 120)):
+        emoji = random.choice(doctor_list)
+        if emoji == doctor_msg[-1:]:
+            consecutive_count += 1
+        else:
+            consecutive_count = 1
+        if consecutive_count > max_repeats:
+            emoji = random.choice([e for e in doctor_list if e != emoji])
+            consecutive_count = 1
+        doctor_msg += emoji
+    await bot.reply_to(message, doctor_msg)
 
 
 async def lock_command(bot, message, cmd):
@@ -42,7 +61,7 @@ async def handle_command(bot, message, cmd):
 
 
 async def inline_message(bot, query):
-    timestamp = int(time.time()) // 300
+    timestamp = int(time.time())
     photo_result1 = telebot.types.InlineQueryResultPhoto(
         id='1',
         photo_url=f'https://api.mahiron.moe/hangzhou.jpg?time={timestamp}',
@@ -55,4 +74,4 @@ async def inline_message(bot, query):
         thumbnail_url=f'https://bili.elaina.pub/biliserver/guangzhou.jpg?time={timestamp}',
         caption='测速地点: 广州百度云'
     )
-    await bot.answer_inline_query(query.id, [photo_result1, photo_result2])
+    await bot.answer_inline_query(query.id, [photo_result1], cache_time=60)
