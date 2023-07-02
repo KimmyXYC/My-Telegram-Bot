@@ -1,5 +1,6 @@
 import asyncio
 import telebot
+import random
 from App import Event
 from loguru import logger
 from telebot import util
@@ -24,6 +25,14 @@ class BotRunner(object):
             from telebot import asyncio_helper
             asyncio_helper.proxy = self.proxy.url
             logger.success("Proxy Set")
+
+        @bot.message_handler(commands=['/calldoctor'])
+        async def call_doctor(message):
+            msg = ""
+            doctor_list = ["👨‍⚕️", "🚑"]
+            for i in range(0, random.randint(80, 150)):
+                msg += random.choice(doctor_list)
+            await bot.reply_to(message, "请稍等, 正在呼叫医生")
 
         @bot.message_handler(commands=['lock_cmd'])
         async def lock_command(message):
