@@ -5,22 +5,25 @@ from loguru import logger
 from Utils.Parameter import get_parameter, save_config
 
 
-async def call_doctor(bot, message):
-    doctor_msg = ""
-    doctor_list = ["👨‍⚕️", "👩‍⚕️", "🚑", "🏥", "💊"]
+async def call_anyone(bot, message):
+    anyone_msg = ""
+    if "/calldoctor" in message.text:
+        anyone_list = ["👨‍⚕️", "👩‍⚕️", "🚑", "🏥", "💊"]
+    elif "/callmtf" in message.text:
+        anyone_list = ["🏳️‍⚧️", "🍥"]
     max_repeats = 3
     consecutive_count = 0
-    for i in range(random.randint(20, 120)):
-        emoji = random.choice(doctor_list)
-        if emoji == doctor_msg[-1:]:
+    for i in range(random.randint(20, 80)):
+        emoji = random.choice(anyone_list)
+        if emoji == anyone_msg[-1:]:
             consecutive_count += 1
         else:
             consecutive_count = 1
         if consecutive_count > max_repeats:
-            emoji = random.choice([e for e in doctor_list if e != emoji])
+            emoji = random.choice([e for e in anyone_list if e != emoji])
             consecutive_count = 1
-        doctor_msg += emoji
-    await bot.reply_to(message, doctor_msg)
+        anyone_msg += emoji
+    await bot.reply_to(message, anyone_msg)
 
 
 async def lock_command(bot, message, cmd):

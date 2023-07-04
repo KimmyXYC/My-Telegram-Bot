@@ -25,9 +25,9 @@ class BotRunner(object):
             asyncio_helper.proxy = self.proxy.url
             logger.success("Proxy Set")
 
-        @bot.message_handler(commands=['calldoctor'])
-        async def call_doctor(message):
-            await Event.call_doctor(bot, message)
+        @bot.message_handler(commands=['calldoctor', 'callmtf'])
+        async def call_anyone(message):
+            await Event.call_anyone(bot, message)
 
         @bot.message_handler(commands=['lock_cmd'])
         async def lock_command(message):
