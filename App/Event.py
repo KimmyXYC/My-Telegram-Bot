@@ -49,18 +49,27 @@ async def handle_ip(bot, message, _config):
                     ip_info = f"""查询目标： `{message.text.split()[1]}`\n解析地址： `{ip_addr}`\n"""
                 else:
                     ip_info = f"""查询目标： `{message.text.split()[1]}`\n"""
-                if data["prov"]:
-                    ip_info += f"""地区： `{data["country"]} - {data["prov"]} - {data["city"]}`\n"""
+                if not data["country"]:
+                    url = "https://api.kimmyxyc.top/ip"
+                    params = {"ip": ip_addr}
+                    response = requests.get(url, params=params)
+                    if response.status_code == 200:
+                        data = response.json()
+                        if data["code"] == 0:
+                            ip_info += f"""地区： `{data["data"]["country"]}`"""
                 else:
-                    ip_info += f"""地区： `{data["country"]}`\n """
-                ip_info += f""" 经纬度： `{data["lng"]}, {data["lat"]}`\nISP： `{data["isp"]}`\n组织： `{data["owner"]}`\n"""
-                url = f"http://ip-api.com/json/{ip_addr}"
-                params = {"lang": "zh-CN"}
-                response = requests.get(url, params=params)
-                if response.status_code == 200:
-                    data = response.json()
-                    if data["status"] == "success":
-                        ip_info += f"""`{data["as"]}`"""
+                    if data["prov"]:
+                        ip_info += f"""地区： `{data["country"]} - {data["prov"]} - {data["city"]}`\n"""
+                    else:
+                        ip_info += f"""地区： `{data["country"]}`\n """
+                    ip_info += f"""经纬度： `{data["lng"]}, {data["lat"]}`\nISP： `{data["isp"]}`\n组织： `{data["owner"]}`\n"""
+                    url = f"http://ip-api.com/json/{ip_addr}"
+                    params = {"lang": "zh-CN"}
+                    response = requests.get(url, params=params)
+                    if response.status_code == 200:
+                        data = response.json()
+                        if data["status"] == "success":
+                            ip_info += f"""`{data["as"]}`"""
                 await bot.reply_to(message, f"{ip_info}", parse_mode="Markdown")
             else:
                 await bot.reply_to(message, f"请求失败: {data['msg']}")
