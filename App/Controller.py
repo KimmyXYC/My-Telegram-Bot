@@ -25,8 +25,6 @@ class BotRunner(object):
             from telebot import asyncio_helper
             asyncio_helper.proxy = self.proxy.url
             logger.success("Proxy Set")
-        self.bot_user = await bot.get_me()
-        logger.success("Bot User Get")
 
         @bot.message_handler(commands=['calldoctor', 'callmtf'])
         async def call_anyone(message):
@@ -35,6 +33,8 @@ class BotRunner(object):
         @bot.message_handler(commands=['lock_cmd'])
         async def lock_command(message):
             if message.chat.type in ['group', 'supergroup']:
+                if self.bot_user is None:
+                    self.bot_user = await bot.get_me()
                 bot_member = await bot.get_chat_member(message.chat.id, self.bot_user.id)
                 if bot_member.status == 'administrator' and bot_member.can_delete_messages:
                     chat_member = await bot.get_chat_member(message.chat.id, message.from_user.id)
