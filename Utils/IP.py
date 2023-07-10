@@ -5,6 +5,7 @@
 # @GitHub: KimmyXYC
 import ipaddress
 import socket
+from loguru import logger
 
 
 def check_url(url):
@@ -24,3 +25,7 @@ def get_ip_address(domain):
         return ip_address
     except socket.gaierror:
         return None
+    except Exception as e:
+        logger.error(e)
+        return None
+
