@@ -78,3 +78,16 @@ def icp_record_check(domain):
             return True, data
         else:
             return False, data["msg"]
+
+
+def whois_check(domain):
+    response = requests.get(f'https://namebeta.com/api/search/check?query={domain}')
+    if response.status_code == 200:
+        result = response.json()['whois']['whois']
+        lines = result.splitlines()
+        filtered_result = [line for line in lines if
+                           'REDACTED FOR PRIVACY' not in line and 'Please query the' not in line]
+        return True, "\n".join(filtered_result).split(
+            "For more information on Whois status codes, please visit https://icann.org/epp")[0]
+    else:
+        return False, None

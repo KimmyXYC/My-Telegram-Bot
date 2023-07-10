@@ -39,6 +39,15 @@ async def handle_icp(bot, message):
     await bot.reply_to(message, icp_info, parse_mode="MarkdownV2")
 
 
+async def handle_whois(bot, message):
+    status, result = whois_check(message.text.split()[1])
+    if not status:
+        await bot.reply_to(message, f"请求失败: {result}")
+        return
+    whois_info = f"`{result}`"
+    await bot.reply_to(message, whois_info, parse_mode="MarkdownV2")
+
+
 async def handle_ip(bot, message, _config):
     ip_addr, ip_type = check_url(message.text.split()[1])
     _is_url = False
