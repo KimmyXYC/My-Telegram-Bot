@@ -1,5 +1,6 @@
 import asyncio
 import telebot
+import re
 from App import Event
 from loguru import logger
 from telebot import util
@@ -88,7 +89,7 @@ class BotRunner(object):
         async def handle_commands(message):
             if message.text.startswith('/'):
                 if self.db.exists(str(message.chat.id)):
-                    command = message.text.split()[0].lower()
+                    command = re.split(r'[@\s]+', message.text.lower())[0]
                     command = command[1:]
                     lock_cmd_list = self.db.get(str(message.chat.id))
                     if lock_cmd_list is None:
