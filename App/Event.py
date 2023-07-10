@@ -27,6 +27,18 @@ async def call_anyone(bot, message):
     await bot.reply_to(message, anyone_msg)
 
 
+async def handle_icp(bot, message):
+    status, data = icp_record_check(message.text.split()[1])
+    if not status:
+        await bot.reply_to(message, f"请求失败: {data}")
+        return
+    if data["icp"] == "未备案":
+        icp_info = f"""查询目标： `{message.text.split()[1]}`\n备案状态： `{data["icp"]}`\n"""
+    else:
+        icp_info = f"""查询目标： `{message.text.split()[1]}`\n备案号： `{data["icp"]}`\n备案主体： `{data["unitName"]}`\n备案性质： `{data["natureName"]}`\n"""
+    await bot.reply_to(message, icp_info, parse_mode="MarkdownV2")
+
+
 async def handle_ip(bot, message, _config):
     ip_addr, ip_type = check_url(message.text.split()[1])
     _is_url = False

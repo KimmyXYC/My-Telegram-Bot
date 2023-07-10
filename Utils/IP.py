@@ -66,3 +66,15 @@ def ipapi_ip(ip_addr):
             return True, data
         else:
             return False, data["message"]
+
+
+def icp_record_check(domain):
+    url = f" https://api.emoao.com/api/icp"
+    params = {"domain": domain}
+    response = requests.get(url, params=params)
+    if response.status_code == 200:
+        data = response.json()
+        if data["code"] == "200":
+            return True, data
+        else:
+            return False, data["msg"]

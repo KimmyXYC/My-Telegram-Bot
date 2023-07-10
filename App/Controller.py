@@ -42,6 +42,16 @@ class BotRunner(object):
             else:
                 await bot.reply_to(message, "格式错误, 格式应为 /ip [ip]")
 
+        @bot.message_handler(commands=['icp'])
+        async def handle_icp(message):
+            command_args = message.text.split()
+            if len(command_args) == 1:
+                await bot.reply_to(message, "格式错误, 格式应为 /icp [domain]")
+            elif len(command_args) == 2:
+                await Event.handle_icp(bot, message)
+            else:
+                await bot.reply_to(message, "格式错误, 格式应为 /icp [domain]")
+
         @bot.message_handler(commands=['lock_cmd'])
         async def lock_command(message):
             if message.chat.type in ['group', 'supergroup']:
