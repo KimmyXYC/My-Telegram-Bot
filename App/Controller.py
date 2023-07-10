@@ -12,7 +12,7 @@ class BotRunner(object):
         self.bot = config.bot
         self.proxy = config.proxy
         self.db = db
-        self.bot_user = None
+        self.bot_id = int(self.bot.botToken.split(':')[0])
 
     def botcreate(self):
         bot = AsyncTeleBot(self.bot.botToken, state_storage=StateMemoryStorage())
@@ -33,9 +33,7 @@ class BotRunner(object):
         @bot.message_handler(commands=['lock_cmd'])
         async def lock_command(message):
             if message.chat.type in ['group', 'supergroup']:
-                if self.bot_user is None:
-                    self.bot_user = await bot.get_me()
-                bot_member = await bot.get_chat_member(message.chat.id, self.bot_user.id)
+                bot_member = await bot.get_chat_member(message.chat.id, self.bot_id)
                 if bot_member.status == 'administrator' and bot_member.can_delete_messages:
                     chat_member = await bot.get_chat_member(message.chat.id, message.from_user.id)
                     if (chat_member.status == 'administrator' and chat_member.can_delete_messages) \
