@@ -27,6 +27,8 @@ async def call_anyone(bot, message):
 
 async def lock_command(bot, message, cmd, db):
     lock_cmd_list = db.get(str(message.chat.id))
+    if lock_cmd_list is None:
+        lock_cmd_list = []
     if cmd in lock_cmd_list:
         await bot.reply_to(message, "该命令已被锁定")
     else:
@@ -38,6 +40,8 @@ async def lock_command(bot, message, cmd, db):
 
 async def unlock_command(bot, message, cmd, db):
     lock_cmd_list = db.get(str(message.chat.id))
+    if lock_cmd_list is None:
+        lock_cmd_list = []
     if cmd in lock_cmd_list:
         lock_cmd_list.remove(cmd)
         db.set(str(message.chat.id), lock_cmd_list)
@@ -49,8 +53,11 @@ async def unlock_command(bot, message, cmd, db):
 
 async def list_locked_command(bot, message, db):
     lock_cmd_list = db.get(str(message.chat.id))
-    msg = "以下命令在本群中被锁定:\n"
-    msg += "\n".join(f"- `{item}`" for item in lock_cmd_list)
+    if lock_cmd_list is None:
+        msg = "本群未锁定任何命令"
+    else:
+        msg = "以下命令在本群中被锁定:\n"
+        msg += "\n".join(f"- `{item}`" for item in lock_cmd_list)
     await bot.reply_to(message, msg, parse_mode='Markdown')
 
 
