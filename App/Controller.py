@@ -12,6 +12,7 @@ class BotRunner(object):
     def __init__(self, config, db):
         self.bot = config.bot
         self.proxy = config.proxy
+        self.config = config
         self.db = db
         self.bot_id = int(self.bot.botToken.split(':')[0])
 
@@ -30,6 +31,16 @@ class BotRunner(object):
         @bot.message_handler(commands=['calldoctor', 'callmtf'])
         async def call_anyone(message):
             await Event.call_anyone(bot, message)
+
+        @bot.message_handler(commands=['ip'])
+        async def handle_ip(message):
+            command_args = message.text.split()
+            if len(command_args) == 1:
+                await bot.reply_to(message, "格式错误, 格式应为 /ip [ip]")
+            elif len(command_args) == 2:
+                await Event.handle_ip(bot, message, self.config.ip)
+            else:
+                await bot.reply_to(message, "格式错误, 格式应为 /ip [ip]")
 
         @bot.message_handler(commands=['lock_cmd'])
         async def lock_command(message):
