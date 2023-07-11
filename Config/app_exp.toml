@@ -6,6 +6,3 @@ botToken = 'key'
 [proxy]
 status = false
 url = "http://127.0.0.1:7890"
-
-[ip]
-appcode = "1234567890"
