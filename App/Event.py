@@ -11,6 +11,8 @@ async def call_anyone(bot, message):
         anyone_list = ["👨‍⚕️", "👩‍⚕️", "🚑", "🏥", "💊"]
     elif "/callmtf" in message.text:
         anyone_list = ["🏳️‍⚧️", "🍥"]
+    elif "/callpolice" in message.text:
+        anyone_list = ["🚨", "👮", "🚔", "🚓"]
     max_repeats = 3
     consecutive_count = 0
     for i in range(random.randint(20, 80)):
@@ -27,7 +29,8 @@ async def call_anyone(bot, message):
 
 
 async def handle_icp(bot, message):
-    msg = await bot.reply_to(message, f"正在查询域名 {message.text.split()[1]} 备案信息...", disable_web_page_preview=True)
+    msg = await bot.reply_to(message, f"正在查询域名 {message.text.split()[1]} 备案信息...",
+                             disable_web_page_preview=True)
     status, data = icp_record_check(message.text.split()[1])
     if not status:
         await bot.reply_to(message, f"请求失败: `{data}`")
@@ -40,7 +43,8 @@ async def handle_icp(bot, message):
 
 
 async def handle_whois(bot, message):
-    msg = await bot.reply_to(message, f"正在查询域名 {message.text.split()[1]} Whois 信息...", disable_web_page_preview=True)
+    msg = await bot.reply_to(message, f"正在查询域名 {message.text.split()[1]} Whois 信息...",
+                             disable_web_page_preview=True)
     status, result = whois_check(message.text.split()[1])
     if not status:
         await bot.edit_message_text(f"请求失败: `{result}`", message.chat.id, msg.message_id, parse_mode="MarkdownV2")
@@ -49,7 +53,8 @@ async def handle_whois(bot, message):
 
 
 async def handle_dns(bot, message, record_type):
-    msg = await bot.reply_to(message, f"DNS lookup {message.text.split()[1]} as {record_type} ...", disable_web_page_preview=True)
+    msg = await bot.reply_to(message, f"DNS lookup {message.text.split()[1]} as {record_type} ...",
+                             disable_web_page_preview=True)
     status, result = get_dns_info(message.text.split()[1], record_type)
     if not status:
         await bot.edit_message_text(f"请求失败: `{result}`", message.chat.id, msg.message_id, parse_mode="MarkdownV2")
@@ -159,9 +164,11 @@ async def handle_ip(bot, message, _config):
                 ip_info += f"""地区： `{data["country"]}`"""
                 await bot.edit_message_text(ip_info, message.chat.id, msg.message_id, parse_mode="MarkdownV2")
             else:
-                await bot.edit_message_text(f"请求失败: `{data['error']}`", message.chat.id, msg.message_id, parse_mode="MarkdownV2")
+                await bot.edit_message_text(f"请求失败: `{data['error']}`", message.chat.id, msg.message_id,
+                                            parse_mode="MarkdownV2")
         else:
-            await bot.edit_message_text(f"请求失败: `{data['message']}`", message.chat.id, msg.message_id, parse_mode="MarkdownV2")
+            await bot.edit_message_text(f"请求失败: `{data['message']}`", message.chat.id, msg.message_id,
+                                        parse_mode="MarkdownV2")
 
 
 async def lock_command(bot, message, cmd, db):
