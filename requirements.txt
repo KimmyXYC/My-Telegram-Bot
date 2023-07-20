@@ -1,7 +1,8 @@
 pyTelegramBotAPI
-rtoml>=0.9.0
-pathlib>=1.0.1
+rtoml
+pathlib
 aiohttp
-loguru>=0.6.0
-requests>=2.31.0
-Pillow>=10.0.0
+loguru
+requests
+Pillow
+elara
