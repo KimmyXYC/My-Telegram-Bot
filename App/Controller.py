@@ -33,7 +33,7 @@ class BotRunner(object):
             if start_param == "zGLamTDcZxqXTY":
                 await bot.reply_to(
                     message,
-                    f"Go to https://www.kimmyxyc.top/defaultmagicpage.html",
+                    f"Go to https://www.kimmyxyc.top/default/magicpage.html",
                     disable_web_page_preview=True
                     )
 
