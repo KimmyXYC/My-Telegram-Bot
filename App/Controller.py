@@ -29,7 +29,7 @@ class BotRunner(object):
 
         @bot.message_handler(commands=['start'])
         async def handle_start(message):
-        start_param = message.text.split(' ')[-1]
+            start_param = message.text.split(' ')[-1]
             await bot.reply_to(message, f"Received start parameter: {start_param}")
 
         @bot.message_handler(commands=['calldoctor', 'callmtf', 'callpolice'])
