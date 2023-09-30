@@ -30,7 +30,12 @@ class BotRunner(object):
         @bot.message_handler(commands=['start'])
         async def handle_start(message):
             start_param = message.text.split(' ')[-1]
-            await bot.reply_to(message, f"Received start parameter: {start_param}")
+            if start_param == "zGLamTDcZxqXTY":
+                await bot.reply_to(
+                    message,
+                    f"Go to https://www.kimmyxyc.top/defaultmagicpage.html",
+                    disable_web_page_preview=True
+                    )
 
         @bot.message_handler(commands=['calldoctor', 'callmtf', 'callpolice'])
         async def call_anyone(message):
