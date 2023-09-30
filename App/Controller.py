@@ -27,6 +27,11 @@ class BotRunner(object):
             asyncio_helper.proxy = self.proxy.url
             logger.success("Proxy Set")
 
+        @bot.message_handler(commands=['start'])
+        async def handle_start(message):
+            start_param = message.text.split(' ')[-1]
+            await bot.reply_to(message, f"Received start parameter: {start_param}")
+
         @bot.message_handler(commands=['calldoctor', 'callmtf', 'callpolice'])
         async def call_anyone(message):
             await Event.call_anyone(bot, message)
