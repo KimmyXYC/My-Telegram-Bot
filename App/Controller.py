@@ -27,16 +27,6 @@ class BotRunner(object):
             asyncio_helper.proxy = self.proxy.url
             logger.success("Proxy Set")
 
-        @bot.message_handler(commands=['start'])
-        async def handle_start(message):
-            start_param = message.text.split(' ')[-1]
-            if start_param == "zGLamTDcZxqXTY":
-                await bot.reply_to(
-                    message,
-                    f"Go to https://www.kimmyxyc.top/default/magicpage.html",
-                    disable_web_page_preview=True
-                    )
-
         @bot.message_handler(commands=['calldoctor', 'callmtf', 'callpolice'])
         async def call_anyone(message):
             await Event.call_anyone(bot, message)
