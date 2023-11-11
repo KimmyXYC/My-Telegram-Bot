@@ -156,6 +156,8 @@ class BotRunner(object):
                 await GoodNewsBot.good_news(bot, message, 1)
             elif message.text.startswith('通报'):
                 await GoodNewsBot.good_news(bot, message, 2)
+            elif message.text.startswith('警报'):
+                await GoodNewsBot.good_news(bot, message, 3)
 
         @bot.inline_handler(lambda query: True)
         async def send_photo(query):

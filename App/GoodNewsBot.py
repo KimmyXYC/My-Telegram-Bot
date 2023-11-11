@@ -27,6 +27,12 @@ async def good_news(bot, message, news_type):
         shadow_color = None
         size = 100
         wrap_width = 10
+    elif news_type == 3:
+        pic_dir = "res/pic/jingbao.png"
+        fill = "white"
+        shadow_color = None
+        size = 90
+        wrap_width = 10
     else:
         await bot.reply_to(message, "发生未知错误")
         return
