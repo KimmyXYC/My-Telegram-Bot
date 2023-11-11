@@ -1,11 +1,11 @@
 import asyncio
 import telebot
 import re
-from App import Event
 from loguru import logger
 from telebot import util
 from telebot.async_telebot import AsyncTeleBot
 from telebot.asyncio_storage import StateMemoryStorage
+from App import Event, PingBot, CmdLockBot, GoodNewsBot
 
 
 class BotRunner(object):
@@ -14,6 +14,7 @@ class BotRunner(object):
         self.proxy = config.proxy
         self.config = config
         self.db = db
+        self.bot_id = int(self.bot.botToken.split(':')[0])
 
     def botcreate(self):
         bot = AsyncTeleBot(self.bot.botToken, state_storage=StateMemoryStorage())
@@ -37,7 +38,7 @@ class BotRunner(object):
             if len(command_args) == 1:
                 await bot.reply_to(message, "格式错误, 格式应为 /ip [IP/Domain]")
             elif len(command_args) == 2:
-                await Event.handle_ip(bot, message, self.config.ip)
+                await PingBot.handle_ip(bot, message, self.config.ip)
             else:
                 await bot.reply_to(message, "格式错误, 格式应为 /ip [IP/Domain]")
 
@@ -47,7 +48,7 @@ class BotRunner(object):
             if len(command_args) == 1:
                 await bot.reply_to(message, "格式错误, 格式应为 /ip_ali [IP/Domain]")
             elif len(command_args) == 2:
-                await Event.handle_ip_ali(bot, message, self.config.ip)
+                await PingBot.handle_ip_ali(bot, message, self.config.ip)
             else:
                 await bot.reply_to(message, "格式错误, 格式应为 /ip_ali [IP/Domain]")
 
@@ -57,7 +58,7 @@ class BotRunner(object):
             if len(command_args) == 1:
                 await bot.reply_to(message, "格式错误, 格式应为 /icp [Domain]")
             elif len(command_args) == 2:
-                await Event.handle_icp(bot, message)
+                await PingBot.handle_icp(bot, message)
             else:
                 await bot.reply_to(message, "格式错误, 格式应为 /icp [Domain]")
 
@@ -67,7 +68,7 @@ class BotRunner(object):
             if len(command_args) == 1:
                 await bot.reply_to(message, "格式错误, 格式应为 /whois [Domain]")
             elif len(command_args) == 2:
-                await Event.handle_whois(bot, message)
+                await PingBot.handle_whois(bot, message)
             else:
                 await bot.reply_to(message, "格式错误, 格式应为 /whois [Domain]")
 
@@ -77,9 +78,9 @@ class BotRunner(object):
             if len(command_args) == 1:
                 await bot.reply_to(message, "格式错误, 格式应为 /dns [Domain](Record_Type)")
             elif len(command_args) == 2:
-                await Event.handle_dns(bot, message, "A")
+                await PingBot.handle_dns(bot, message, "A")
             elif len(command_args) == 3:
-                await Event.handle_dns(bot, message, command_args[2])
+                await PingBot.handle_dns(bot, message, command_args[2])
             else:
                 await bot.reply_to(message, "格式错误, 格式应为 /dns [Domain](Record_Type)")
 
@@ -96,7 +97,7 @@ class BotRunner(object):
                             await bot.reply_to(message, "格式错误, 格式应为 /lock_cmd [CMD]")
                         elif len(command_args) == 2:
                             cmd = command_args[1]
-                            await Event.lock_command(bot, message, cmd, self.db)
+                            await CmdLockBot.lock_command(bot, message, cmd, self.db)
                         else:
                             await bot.reply_to(message, "格式错误, 格式应为 /lock_cmd [CMD]")
                     else:
@@ -117,7 +118,7 @@ class BotRunner(object):
                         await bot.reply_to(message, "格式错误, 格式应为 /unlock_cmd [CMD]")
                     elif len(command_args) == 2:
                         cmd = command_args[1]
-                        await Event.unlock_command(bot, message, cmd, self.db)
+                        await CmdLockBot.unlock_command(bot, message, cmd, self.db)
                     else:
                         await bot.reply_to(message, "格式错误, 格式应为 /unlock_cmd [CMD]")
                 else:
@@ -131,23 +132,30 @@ class BotRunner(object):
                 chat_member = await bot.get_chat_member(message.chat.id, message.from_user.id)
                 if (chat_member.status == 'administrator' and chat_member.can_delete_messages) \
                         or chat_member.status == 'creator':
-                    await Event.list_locked_command(bot, message, self.db)
+                    await CmdLockBot.list_locked_command(bot, message, self.db)
                 else:
                     await bot.reply_to(message, "您无权使用此功能")
             else:
                 await bot.reply_to(message, "请在群组中使用此功能")
 
-        @bot.message_handler(func=lambda message: message.chat.type in ['group', 'supergroup'], content_types=['text'])
+        @bot.message_handler(func=lambda message: message.chat.type in ['group', 'supergroup', 'private'], content_types=['text'])
         async def handle_commands(message):
             if message.text.startswith('/'):
-                if self.db.exists(str(message.chat.id)):
-                    command = re.split(r'[@\s]+', message.text.lower())[0]
-                    command = command[1:]
-                    lock_cmd_list = self.db.get(str(message.chat.id))
-                    if lock_cmd_list is None:
-                        lock_cmd_list = []
-                    if command in lock_cmd_list:
-                        await bot.delete_message(message.chat.id, message.message_id)
+                if message.chat.type in ['group', 'supergroup']:
+                    if self.db.exists(str(message.chat.id)):
+                        command = re.split(r'[@\s]+', message.text.lower())[0]
+                        command = command[1:]
+                        lock_cmd_list = self.db.get(str(message.chat.id))
+                        if lock_cmd_list is None:
+                            lock_cmd_list = []
+                        if command in lock_cmd_list:
+                            await bot.delete_message(message.chat.id, message.message_id)
+            elif message.text.startswith('喜报'):
+                await GoodNewsBot.good_news(bot, message, 0)
+            elif message.text.startswith('悲报'):
+                await GoodNewsBot.good_news(bot, message, 1)
+            elif message.text.startswith('通报'):
+                await GoodNewsBot.good_news(bot, message, 2)
 
         @bot.inline_handler(lambda query: True)
         async def send_photo(query):
