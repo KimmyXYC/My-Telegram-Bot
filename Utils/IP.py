@@ -111,7 +111,7 @@ async def whois_check(domain):
                 result = await response.json()
                 if "whois" not in result:
                     return False, result
-                result = result['whois']
+                result = result['whois']['whois']
                 lines = result.splitlines()
                 filtered_result = [line for line in lines if
                                    'REDACTED FOR PRIVACY' not in line and 'Please query the' not in line]
