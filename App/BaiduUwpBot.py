@@ -285,12 +285,14 @@ class BaiduUwp:
                 caption=f"**获取失败：**\n{e}" if fetch_failed else ''
             )
         await query.message.delete()
+        logger.info(f"{query.from_user.id}_{msg.id}")
         self.chat_data[f'bd_rlist_{query.from_user.id}_{msg.id}'] = self.chat_data[f'bd_rlist_{mid}']
         self.chat_data.pop(f'bd_rlist_{mid}')
         os.remove(path)
 
     async def baidu_exit(self, bot, query):
         mid = f'{query.from_user.id}_{query.message.id}'
+        logger.info(mid)
         if self.chat_data.get(f'bd_rlist_{mid}'):
             await bot.edit_message_text('已退出『百度解析』', query.message.chat.id, query.message.message_id)
         else:
