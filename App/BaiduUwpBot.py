@@ -13,7 +13,6 @@ import math
 import os
 import re
 import httpx
-from pathlib import Path
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, Message
 from dataclasses import dataclass
 from typing import List, Tuple
@@ -271,22 +270,16 @@ class BaiduUwp:
         {u}
 
         """
-        if not os.path.exists('downloads'):
-            os.mkdir('downloads')
-        path = f"{str(Path.cwd())}/downloads/{dirname}.txt"
-        with open(path, 'w', encoding='utf-8') as f:
-            f.write(text)
         e = '\n'.join(fetch_failed)
         msg: Message = await bot.send_document(
             query.message.chat.id,
-            document=path,
+            text,
             reply_markup=InlineKeyboardMarkup(button),
             caption=f"**获取失败：**\n{e}" if fetch_failed else ''
         )
         await query.message.delete()
         self.chat_data[f'bd_rlist_{query.from_user.id}_{msg.id}'] = self.chat_data[f'bd_rlist_{mid}']
         self.chat_data.pop(f'bd_rlist_{mid}')
-        os.remove(path)
 
     async def baidu_exit(self, bot, query):
         mid = f'{query.from_user.id}_{query.message.id}'
