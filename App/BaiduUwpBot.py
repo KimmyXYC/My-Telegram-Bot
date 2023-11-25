@@ -171,7 +171,12 @@ class BaiduUwp:
         self.chat_data[f'bd_rlist_{mid}'] = dir_list
 
         text, button = self.build_menu(dir_list)
-        await bot.edit_message_text(text, query.message.chat.id, query.message.message_id, reply_markup=InlineKeyboardMarkup(button))
+        await bot.edit_message_text(
+            text,
+            query.message.chat.id,
+            query.message.message_id,
+            reply_markup=InlineKeyboardMarkup(button)
+        )
         await self.preloading(rlist, dir_list, mid)
 
     async def baidu_file(self, bot, query):
@@ -206,7 +211,14 @@ class BaiduUwp:
                 InlineKeyboardButton('❌关闭菜单', callback_data='bdexit')
             ]
         ]
-        await bot.edit_message_text(text, query.message.chat.id, query.message.message_id, reply_markup=InlineKeyboardMarkup(button), disable_web_page_preview=True)
+        await bot.edit_message_text(
+            text,
+            query.message.chat.id,
+            query.message.message_id,
+            reply_markup=InlineKeyboardMarkup(button),
+            parse_mode='Markdown',
+            disable_web_page_preview=True
+        )
 
     async def baidu_all_dl(self, bot, query):
         mid = f'{query.from_user.id}_{query.message.id}'
@@ -264,9 +276,12 @@ class BaiduUwp:
         with open(path, 'w', encoding='utf-8') as f:
             f.write(text)
         e = '\n'.join(fetch_failed)
-        msg: Message = await query.message.reply_document(document=path, reply_markup=InlineKeyboardMarkup(button),
-                                                          caption=f"**获取失败：**\n{e}" if fetch_failed else '',
-                                                          reply_to_message_id=query.message.id - 1)
+        msg: Message = await bot.send_document(
+            query.message.chat.id,
+            document=path,
+            reply_markup=InlineKeyboardMarkup(button),
+            caption=f"**获取失败：**\n{e}" if fetch_failed else ''
+        )
         await query.message.delete()
         self.chat_data[f'bd_rlist_{query.from_user.id}_{msg.id}'] = self.chat_data[f'bd_rlist_{mid}']
         self.chat_data.pop(f'bd_rlist_{mid}')
