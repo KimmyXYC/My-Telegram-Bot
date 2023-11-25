@@ -282,7 +282,7 @@ class BaiduUwp:
                 query.message.chat.id,
                 file,
                 reply_markup=InlineKeyboardMarkup(button),
-                caption=f"**获取失败：**\n{e}" if fetch_failed else ''
+                caption=f"**获取失败：**\n{e}" if fetch_failed else f'{dirname}.txt',
             )
         await bot.delete_message(query.message.chat.id, query.message.message_id)
         self.chat_data[f'bd_rlist_{query.from_user.id}_{msg.id}'] = self.chat_data[f'bd_rlist_{mid}']
