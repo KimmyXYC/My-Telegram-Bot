@@ -13,6 +13,7 @@ import math
 import os
 import re
 import httpx
+from pathlib import Path
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, Message
 from dataclasses import dataclass
 from typing import List, Tuple
@@ -272,7 +273,7 @@ class BaiduUwp:
         """
         if not os.path.exists('downloads'):
             os.mkdir('downloads')
-        path = f"downloads/{dirname}.txt"
+        path = f"{str(Path.cwd())}/downloads/{dirname}.txt"
         with open(path, 'w', encoding='utf-8') as f:
             f.write(text)
         e = '\n'.join(fetch_failed)

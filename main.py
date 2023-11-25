@@ -12,7 +12,7 @@ logger.add(sink='run.log',
            level="INFO",
            rotation="20 MB",
            enqueue=True)
-db = elara.exe(path="Config/lock_cmd.db", commitdb=True)
+db = elara.exe(path=f"{str(Path.cwd())}/Config/lock_cmd.db", commitdb=True)
 config = ReadConfig().parse_file(str(Path.cwd()) + "/Config/app.toml")
 App = BotRunner(config, db)
 App.run()
