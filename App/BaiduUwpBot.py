@@ -246,8 +246,10 @@ User-Agent：`{dir_list.user_agent}`
         results = [future.result() for future in concurrent.futures.wait(futures).done]
 
         button = [
-            InlineKeyboardButton('📖查看下载教程',
-                                 url='https://telegra.ph/%E4%B8%8B%E8%BD%BD%E6%8F%90%E7%A4%BA-07-13')
+            [
+                InlineKeyboardButton('📖查看下载教程',
+                                     url='https://telegra.ph/%E4%B8%8B%E8%BD%BD%E6%8F%90%E7%A4%BA-07-13')
+            ]
         ]
         t = [f"➡️{v[0]}\n{v[1]}" for v in results if v]
         u = '\n'.join([n[1] for n in results if n])
