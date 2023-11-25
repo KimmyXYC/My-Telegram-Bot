@@ -138,7 +138,7 @@ class BaiduUwp:
             await bot.edit_message_text(f'错误：{e}', msg.chat.id, msg.message_id)
 
     async def baidu_list(self, bot, query):
-        mid = f'{query.from_user.id}_{query.message.id}'
+        mid = f'{query.from_user.id}_{query.message.message_id}'
         rlist: ParseList = self.chat_data.get(f'bd_rlist_{mid}')
         if not rlist:
             return await bot.answer_callback_query(query.id, text="这不是你的解析结果哦", show_alert=True)
@@ -181,7 +181,7 @@ class BaiduUwp:
         await self.preloading(rlist, dir_list, mid)
 
     async def baidu_file(self, bot, query):
-        mid = f'{query.from_user.id}_{query.message.id}'
+        mid = f'{query.from_user.id}_{query.message.message_id}'
         rlist: ParseList = self.chat_data.get(f'bd_rlist_{mid}')
         if not rlist:
             return await bot.answer_callback_query(query.id, text="这不是你的解析结果哦", show_alert=True)
@@ -191,16 +191,16 @@ class BaiduUwp:
         baidu = Baidu(self.config, rlist)
         dir_list = await baidu.get_dlurl(fs_id=fs_id)
         text = f"""
-        路径：`{dir_list.path}`
+路径：`{dir_list.path}`
 
-        文件名称：`{dir_list.file_name}`
-        文件大小：`{dir_list.file_size}`
-        MD5：`{dir_list.md5}`
-        上传时间：`{dir_list.upload_time}`
-        User-Agent：`{dir_list.user_agent}`
+文件名称：`{dir_list.file_name}`
+文件大小：`{dir_list.file_size}`
+MD5：`{dir_list.md5}`
+上传时间：`{dir_list.upload_time}`
+User-Agent：`{dir_list.user_agent}`
 
-        **>>>[点击查看下载教程](https://telegra.ph/%E4%B8%8B%E8%BD%BD%E6%8F%90%E7%A4%BA-07-13)<<<**
-        """
+**>>>[点击查看下载教程](https://telegra.ph/%E4%B8%8B%E8%BD%BD%E6%8F%90%E7%A4%BA-07-13)<<<**
+"""
         button = [
             [
                 InlineKeyboardButton('💾下载文件', url=dir_list.directlink),
@@ -222,7 +222,7 @@ class BaiduUwp:
         )
 
     async def baidu_all_dl(self, bot, query):
-        mid = f'{query.from_user.id}_{query.message.id}'
+        mid = f'{query.from_user.id}_{query.message.message_id}'
         rlist: ParseList = self.chat_data.get(f'bd_rlist_{mid}')
         if not rlist:
             return await bot.answer_callback_query(query.id, text="这不是你的解析结果哦", show_alert=True)
@@ -246,14 +246,8 @@ class BaiduUwp:
         results = [future.result() for future in concurrent.futures.wait(futures).done]
 
         button = [
-            [
-                InlineKeyboardButton('📖查看下载教程',
-                                     url='https://telegra.ph/%E4%B8%8B%E8%BD%BD%E6%8F%90%E7%A4%BA-07-13')
-            ],
-            [
-                InlineKeyboardButton("🔙返回上级", callback_data='bd_dl_rt'),
-                InlineKeyboardButton('❌关闭菜单', callback_data='bdexit')
-            ]
+            InlineKeyboardButton('📖查看下载教程',
+                                 url='https://telegra.ph/%E4%B8%8B%E8%BD%BD%E6%8F%90%E7%A4%BA-07-13')
         ]
         t = [f"➡️{v[0]}\n{v[1]}" for v in results if v]
         u = '\n'.join([n[1] for n in results if n])
@@ -282,7 +276,7 @@ class BaiduUwp:
                 query.message.chat.id,
                 file,
                 reply_markup=InlineKeyboardMarkup(button),
-                caption=f"**获取失败：**\n{e}" if fetch_failed else f'{dirname}.txt',
+                caption=f"**获取失败：**\n{e}" if fetch_failed else f'',
             )
         await bot.delete_message(query.message.chat.id, query.message.message_id)
         self.chat_data[f'bd_rlist_{query.from_user.id}_{msg.id}'] = self.chat_data[f'bd_rlist_{mid}']
@@ -290,7 +284,7 @@ class BaiduUwp:
         os.remove(path)
 
     async def baidu_exit(self, bot, query):
-        mid = f'{query.from_user.id}_{query.message.id}'
+        mid = f'{query.from_user.id}_{query.message.message_id}'
         if self.chat_data.get(f'bd_rlist_{mid}'):
             await bot.edit_message_text('已退出『百度解析』', query.message.chat.id, query.message.message_id)
         else:
