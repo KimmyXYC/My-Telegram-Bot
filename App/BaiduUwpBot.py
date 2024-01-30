@@ -110,7 +110,7 @@ class BaiduUwp:
             text = f"""
 {system}
 请加上分享链接，链接格式随意，例：
-`/bd 链接: https://pan.baidu.com/s/1uY-UL9KN9cwKiTX5TzIEuw?pwd=jwdp 提取码: jwdp 复制这段内容后打开百度网盘手机App，操作更方便哦`
+`/bd@NachoNekoX_bot 链接: https://pan.baidu.com/s/1uY-UL9KN9cwKiTX5TzIEuw?pwd=jwdp 提取码: jwdp`
             """
             return await bot.reply_to(message, text, parse_mode='Markdown', disable_web_page_preview=True)
         msg = await bot.reply_to(message, '解析中...')
@@ -198,15 +198,12 @@ class BaiduUwp:
 MD5：`{dir_list.md5}`
 上传时间：`{dir_list.upload_time}`
 User-Agent：`{dir_list.user_agent}`
+**[💾 文件下载地址（记得带UA）]({dir_list.directlink})**
 
-**>>>[点击查看下载教程](https://telegra.ph/%E4%B8%8B%E8%BD%BD%E6%8F%90%E7%A4%BA-07-13)<<<**
+**[📖 点击查看下载教程](https://telegra.ph/%E4%B8%8B%E8%BD%BD%E6%8F%90%E7%A4%BA-07-13)**
+由 @BakaDown 提供技术支持
 """
         button = [
-            [
-                InlineKeyboardButton('💾下载文件', url=dir_list.directlink),
-                InlineKeyboardButton('📖查看下载教程',
-                                     url='https://telegra.ph/%E4%B8%8B%E8%BD%BD%E6%8F%90%E7%A4%BA-07-13')
-            ],
             [
                 InlineKeyboardButton("🔙返回上级", callback_data='bd_dl_rt'),
                 InlineKeyboardButton('❌关闭菜单', callback_data='bdexit')
@@ -288,7 +285,7 @@ User-Agent：`{dir_list.user_agent}`
     async def baidu_exit(self, bot, query):
         mid = f'{query.from_user.id}_{query.message.message_id}'
         if self.chat_data.get(f'bd_rlist_{mid}'):
-            await bot.edit_message_text('已退出『百度解析』', query.message.chat.id, query.message.message_id)
+            await bot.delete_message(query.message.chat.id, query.message.message_id)
         else:
             return await bot.answer_callback_query(query.id, text="这不是你的解析结果哦", show_alert=True)
 
@@ -474,6 +471,8 @@ class Baidu:
 SVIP账号状态
 上次解析: {system.last_time}
 账号状态: {'限速' if system.limit else '正常'}
+
+由 @BakaDown 提供技术支持
 """
 
     @retry()
