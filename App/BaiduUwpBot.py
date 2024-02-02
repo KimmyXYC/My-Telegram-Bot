@@ -110,8 +110,10 @@ class BaiduUwp:
             text = f"""
 {system}
 请加上分享链接，链接格式随意，例：
-`/bd 链接: https://pan.baidu.com/s/1uY-UL9KN9cwKiTX5TzIEuw?pwd=jwdp 提取码: jwdp 复制这段内容后打开百度网盘手机App，操作更方便哦`
+`/bd 链接: https://pan.baidu.com/s/1O8XXw-t5CkqKhj4WvjBszw?pwd=o1jp 提取码:o1jp`
             """
+            if self.config.ad_info:
+                text += f"\n{self.config.ad_info}"
             return await bot.reply_to(message, text, parse_mode='Markdown', disable_web_page_preview=True)
         msg = await bot.reply_to(message, '解析中...')
         mid = f'{message.from_user.id}_{msg.id}'
@@ -198,9 +200,12 @@ class BaiduUwp:
 MD5：`{dir_list.md5}`
 上传时间：`{dir_list.upload_time}`
 User-Agent：`{dir_list.user_agent}`
+**[💾 文件下载地址（记得带UA）]({dir_list.directlink})**
 
-**>>>[点击查看下载教程](https://telegra.ph/%E4%B8%8B%E8%BD%BD%E6%8F%90%E7%A4%BA-07-13)<<<**
+**[📖 点击查看下载教程](https://telegra.ph/%E4%B8%8B%E8%BD%BD%E6%8F%90%E7%A4%BA-07-13)**
 """
+        if self.config.ad_info:
+            text += f"\n{self.config.ad_info}"
         button = [
             [
                 InlineKeyboardButton('💾下载文件', url=dir_list.directlink),
@@ -288,7 +293,7 @@ User-Agent：`{dir_list.user_agent}`
     async def baidu_exit(self, bot, query):
         mid = f'{query.from_user.id}_{query.message.message_id}'
         if self.chat_data.get(f'bd_rlist_{mid}'):
-            await bot.edit_message_text('已退出『百度解析』', query.message.chat.id, query.message.message_id)
+            await bot.delete_message(query.message.chat.id, query.message.message_id)
         else:
             return await bot.answer_callback_query(query.id, text="这不是你的解析结果哦", show_alert=True)
 

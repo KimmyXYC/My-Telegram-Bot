@@ -23,6 +23,6 @@ class ReadConfig(object):
         self.config = None
 
     def parse_file(self, paths):
-        data = rtoml.load(open(paths, 'r'))
+        data = rtoml.load(open(paths, 'r', encoding='utf-8'))
         self.config = Tool().dict_to_obj(data)
         return self.config

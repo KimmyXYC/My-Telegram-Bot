@@ -15,3 +15,4 @@ members = [100, -100200]
 baidu_version = '4'
 baidu_url = 'https://baidu.example.com'
 baidu_password = 'password'
+ad_info = ""
