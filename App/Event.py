@@ -37,8 +37,8 @@ async def inline_message(bot, query):
     )
     photo_result2 = telebot.types.InlineQueryResultPhoto(
         id='2',
-        photo_url=f'https://bili.elaina.pub/biliserver/guangzhou.jpg?time={timestamp}',
-        thumbnail_url=f'https://bili.elaina.pub/biliserver/guangzhou.jpg?time={timestamp}',
-        caption='测速地点: 广州百度云'
+        photo_url=f'https://api.sayo.ink/biliroaming-speed?time={timestamp}',
+        thumbnail_url=f'https://api.sayo.ink/biliroaming-speed?time={timestamp}',
+        caption='测速地点: 杭州阿里云'
     )
-    await bot.answer_inline_query(query.id, [photo_result1], cache_time=60)
+    await bot.answer_inline_query(query.id, [photo_result1, photo_result2], cache_time=60)
