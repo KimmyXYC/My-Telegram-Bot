@@ -49,9 +49,7 @@ async def good_news(bot, message, news_type):
         text_width = draw.textlength(wrapped_lines[0], font)
         text_height = size * num_lines
     else:
-        text_width = draw.textlength(text, font)
-        text_height = size
-        wrapped_text = text
+        return
     position = ((img.width - text_width) / 2, (img.height - text_height) / 2)
     shadow_offset = (3, 3)
     if shadow_color is not None:
