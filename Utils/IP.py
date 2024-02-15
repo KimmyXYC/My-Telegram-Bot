@@ -89,15 +89,15 @@ async def ipapi_ip(ip_addr):
 
 
 async def icp_record_check(domain):
-    url = "https://api.emoao.com/api/icp"
-    params = {"domain": domain}
+    url = "https://api.sayo.ink/icp/web"
+    params = {"search": domain}
 
     async with aiohttp.ClientSession() as session:
-        async with session.get(url, params=params) as response:
+        async with session.get(url, params=params, timeout=20) as response:
             if response.status == 200:
                 data = await response.json()
-                if data["code"] == "200":
-                    return True, data
+                if data["code"] == 200:
+                    return True, data["params"]["list"]
                 else:
                     return False, data["msg"]
             else:
