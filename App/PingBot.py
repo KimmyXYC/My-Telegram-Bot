@@ -3,7 +3,9 @@
 # @FileName: PingBot.py
 # @Software: PyCharm
 # @GitHub: KimmyXYC
+import re
 from Utils.IP import *
+from Utils.Tool import escape_md_v2_text
 
 
 async def handle_icp(bot, message):
@@ -114,17 +116,30 @@ async def handle_ip(bot, message, _config):
             else:
                 ip_info = f"""查询目标： `{url}`\n"""
             if data["regionName"]:
-                ip_info += f"""地区： `{data["country"]} - {data["regionName"]} - {data["city"]}`\n"""
+                if data["city"]:
+                    ip_info += f"""地区： `{data["country"]} - {data["regionName"]} - {data["city"]}`\n"""
+                else:
+                    ip_info += f"""地区： `{data["country"]} - {data["regionName"]}`\n"""
             else:
-                ip_info += f"""地区： `{data["country"]}`\n"""
-            ip_info += f"""经纬度： `{data["lon"]}, {data["lat"]}`\nISP： `{data["isp"]}`\n组织： `{data["org"]}`\n`{data["as"]}`"""
+                if data["city"]:
+                    ip_info += f"""地区： `{data["country"]} - {data["city"]}`\n"""
+                else:
+                    ip_info += f"""地区： `{data["country"]}`\n"""
+            ip_info += f"""经纬度： `{data["lon"]}, {data["lat"]}`\nISP： `{data["isp"]}`\n组织： `{data["org"]}`\n"""
+            escape_as = escape_md_v2_text(data["as"])
+            re_match = re.search(r'(AS\d+)', data["as"])
+            if re_match:
+                as_number = re_match.group(1)
+                ip_info += f"""[{escape_as}](https://bgp.he.net/{as_number})"""
+            else:
+                ip_info += f"""`{data["as"]}`"""
         if data["mobile"]:
-            ip_info += f"""\n此 IP 可能为**蜂窝移动数据 IP**"""
+            ip_info += f"""\n此 IP 可能为 **蜂窝移动数据 IP**"""
         if data["proxy"]:
-            ip_info += f"""\n此 IP 可能为**代理 IP**"""
+            ip_info += f"""\n此 IP 可能为 **代理 IP**"""
         if data["hosting"]:
-            ip_info += f"""\n此 IP 可能为**数据中心 IP**"""
-        await bot.edit_message_text(ip_info, message.chat.id, msg.message_id, parse_mode="MarkdownV2")
+            ip_info += f"""\n此 IP 可能为 **数据中心 IP**"""
+        await bot.edit_message_text(ip_info, message.chat.id, msg.message_id, parse_mode="MarkdownV2", disable_web_page_preview=True)
     else:
         if data["message"] == "reserved range":
             if url == data["query"]:
