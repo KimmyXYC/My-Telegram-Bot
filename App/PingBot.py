@@ -15,10 +15,10 @@ async def handle_icp(bot, message):
         await bot.reply_to(message, f"请求失败: `{data}`")
         return
     if not data:
-        icp_info = f"""查询目标： `{message.text.split()[1]}`\n备案状态： `未备案`"""
+        icp_info = f"""查询目标:  `{message.text.split()[1]}`\n备案状态:  `未备案`"""
     else:
         data = data[0]
-        icp_info = f"""查询目标： `{data["domain"]}`\n备案号： `{data["mainLicence"]}`\n备案主体： `{data["unitName"]}`\n备案性质： `{data["natureName"]}`\n备案时间： `{data["updateRecordTime"]}`"""
+        icp_info = f"""查询目标:  `{data["domain"]}`\n备案号:  `{data["mainLicence"]}`\n备案主体:  `{data["unitName"]}`\n备案性质:  `{data["natureName"]}`\n备案时间:  `{data["updateRecordTime"]}`"""
     await bot.edit_message_text(icp_info, message.chat.id, msg.message_id, parse_mode="MarkdownV2")
 
 
@@ -69,26 +69,28 @@ async def handle_ip_ali(bot, message, _config):
             await bot.edit_message_text(f"请求失败: `{data}`", message.chat.id, msg.message_id, parse_mode="MarkdownV2")
             return
         if _is_url:
-            ip_info = f"""查询目标： `{message.text.split()[1]}`\n解析地址： `{ip_addr}`\n"""
+            ip_info = f"""查询目标:  `{message.text.split()[1]}`\n解析地址:  `{ip_addr}`\n"""
         else:
-            ip_info = f"""查询目标： `{message.text.split()[1]}`\n"""
+            ip_info = f"""查询目标:  `{message.text.split()[1]}`\n"""
         if not data["country"]:
             status, data = await kimmy_ip(ip_addr)
             if status:
-                ip_info += f"""地区： `{data["country"]}`"""
+                ip_info += f"""地区:  `{data["country"]}`"""
         else:
             if ip_type == "v4":
                 if data["prov"]:
-                    ip_info += f"""地区： `{data["country"]} - {data["prov"]} - {data["city"]}`\n"""
+                    ip_info += f"""地区:  `{data["country"]} - {data["prov"]} - {data["city"]}`\n"""
                 else:
-                    ip_info += f"""地区： `{data["country"]}`\n"""
+                    ip_info += f"""地区:  `{data["country"]}`\n"""
             else:
                 if data["province"]:
-                    ip_info += f"""地区： `{data["country"]} - {data["province"]} - {data["city"]}`\n"""
+                    ip_info += f"""地区:  `{data["country"]} - {data["province"]} - {data["city"]}`\n"""
                 else:
-                    ip_info += f"""地区： `{data["country"]}`\n"""
-            ip_info += f"""经纬度： `{data["lng"]}, {data["lat"]}`\nISP： `{data["isp"]}`\n组织： `{data["owner"]}`\nAS号： `AS{data["asnumber"]}`"""
-        await bot.edit_message_text(ip_info, message.chat.id, msg.message_id, parse_mode="MarkdownV2")
+                    ip_info += f"""地区:  `{data["country"]}`\n"""
+            ip_info += f"""经纬度:  `{data["lng"]}, {data["lat"]}`\nISP:  `{data["isp"]}`\n组织:  `{data["owner"]}`\n"""
+            if data["asnumber"]:
+                ip_info += f"""ASN:  [AS{data["asnumber"]}](https://bgp.he.net/AS{data["asnumber"]})"""
+        await bot.edit_message_text(ip_info, message.chat.id, msg.message_id, parse_mode="MarkdownV2", disable_web_page_preview=True)
     else:
         await bot.edit_message_text("非法的 IP 地址或域名", message.chat.id, msg.message_id, parse_mode="MarkdownV2")
 
@@ -104,28 +106,28 @@ async def handle_ip(bot, message, _config):
             _is_url = True
         if not data["country"]:
             if _is_url:
-                ip_info = f"""查询目标： `{url}`\n解析地址： `{data["query"]}`\n"""
+                ip_info = f"""查询目标:  `{url}`\n解析地址:  `{data["query"]}`\n"""
             else:
-                ip_info = f"""查询目标： `{url}`\n"""
+                ip_info = f"""查询目标:  `{url}`\n"""
             status, data = await kimmy_ip(data["query"])
             if status:
-                ip_info += f"""地区： `{data["country"]}`"""
+                ip_info += f"""地区:  `{data["country"]}`"""
         else:
             if _is_url:
-                ip_info = f"""查询目标： `{url}`\n解析地址： `{data["query"]}`\n"""
+                ip_info = f"""查询目标:  `{url}`\n解析地址:  `{data["query"]}`\n"""
             else:
-                ip_info = f"""查询目标： `{url}`\n"""
+                ip_info = f"""查询目标:  `{url}`\n"""
             if data["regionName"]:
                 if data["city"]:
-                    ip_info += f"""地区： `{data["country"]} - {data["regionName"]} - {data["city"]}`\n"""
+                    ip_info += f"""地区:  `{data["country"]} - {data["regionName"]} - {data["city"]}`\n"""
                 else:
-                    ip_info += f"""地区： `{data["country"]} - {data["regionName"]}`\n"""
+                    ip_info += f"""地区:  `{data["country"]} - {data["regionName"]}`\n"""
             else:
                 if data["city"]:
-                    ip_info += f"""地区： `{data["country"]} - {data["city"]}`\n"""
+                    ip_info += f"""地区:  `{data["country"]} - {data["city"]}`\n"""
                 else:
-                    ip_info += f"""地区： `{data["country"]}`\n"""
-            ip_info += f"""经纬度： `{data["lon"]}, {data["lat"]}`\nISP： `{data["isp"]}`\n组织： `{data["org"]}`\n"""
+                    ip_info += f"""地区:  `{data["country"]}`\n"""
+            ip_info += f"""经纬度:  `{data["lon"]}, {data["lat"]}`\nISP:  `{data["isp"]}`\n组织:  `{data["org"]}`\n"""
             escape_as = escape_md_v2_text(data["as"])
             re_match = re.search(r'(AS\d+)', data["as"])
             if re_match:
@@ -147,12 +149,12 @@ async def handle_ip(bot, message, _config):
             else:
                 _is_url = True
             if _is_url:
-                ip_info = f"""查询目标： `{message.text.split()[1]}`\n解析地址： `{data["query"]}`\n"""
+                ip_info = f"""查询目标:  `{message.text.split()[1]}`\n解析地址:  `{data["query"]}`\n"""
             else:
-                ip_info = f"""查询目标： `{message.text.split()[1]}`\n"""
+                ip_info = f"""查询目标:  `{message.text.split()[1]}`\n"""
             status, data = await kimmy_ip(data["query"])
             if status:
-                ip_info += f"""地区： `{data["country"]}`"""
+                ip_info += f"""地区:  `{data["country"]}`"""
                 await bot.edit_message_text(ip_info, message.chat.id, msg.message_id, parse_mode="MarkdownV2")
             else:
                 await bot.edit_message_text(f"请求失败: `{data['error']}`", message.chat.id, msg.message_id, parse_mode="MarkdownV2")

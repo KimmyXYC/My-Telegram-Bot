@@ -130,6 +130,7 @@ async def get_dns_info(domain, record_type):
         "TXT": 16,
         "AAAA": 28,
     }
+    record_type = record_type.upper()
     if record_type not in qtype.keys():
         return False, "record_type error"
 
