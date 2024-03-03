@@ -33,6 +33,9 @@ async def appellation(bot, message, bot_id):
     if bot_member.status != "administrator" or not bot_member.can_promote_members:
         return
     if message.reply_to_message is None:
+        if message.from_user.username == "GroupAnonymousBot":
+            await bot.reply_to(message, "咱不能更改匿名管理员的头衔喵")
+            return
         user_id = message.from_user.id
         user_rank = message.from_user.first_name
         if message.from_user.last_name:
@@ -48,7 +51,9 @@ async def appellation(bot, message, bot_id):
     if len(message.text.split()) != 1:
         user_rank = message.text.split(maxsplit=1)[1]
     user_member = await bot.get_chat_member(message.chat.id, user_id)
-    successful_change = True
+    if user_member.status == "creator":
+        await bot.reply_to(message, "咱不能对群主使用喵")
+        return
     if user_member.status == "member":
         await bot.promote_chat_member(message.chat.id, user_id, can_manage_chat=True)
     user_rank = remove_emoji(user_rank)
@@ -56,19 +61,23 @@ async def appellation(bot, message, bot_id):
         await bot.set_chat_administrator_custom_title(message.chat.id, user_id, user_rank)
     except Exception as e:
         logger.error(e)
-        successful_change = False
+        error_message = str(e)
+        if ("not enough rights to change custom title of the user" in error_message
+                or " only creator can edit their custom title" in error_message):
+            await bot.reply_to(message, f"咱只能更改由咱自己设置的管理员的头衔")
+        else:
+            start_index = error_message.find("Bad Request: ")
+            if start_index != -1:
+                error_message = error_message[start_index + len("Bad Request: "):]
+                await bot.reply_to(message, f"失败了喵: {error_message}")
+        return
+
     if message.reply_to_message is None:
-        if successful_change:
-            await bot.reply_to(message, f"好, 你现在是 {user_rank} 啦")
-        else:
-            await bot.reply_to(message, f"咱只能更改由咱自己设置的管理员的头衔")
+        await bot.reply_to(message, f"好, 你现在是 {user_rank} 啦")
     else:
-        if successful_change:
-            init_user_mention = f"<a href='tg://user?id={message.from_user.id}'>{message.from_user.first_name}</a>"
-            target_user_mention = f"<a href='tg://user?id={user_id}'>{message.reply_to_message.from_user.first_name}</a>"
-            await bot.reply_to(message, f"{init_user_mention} 把 {target_user_mention} 变成 {user_rank} !", parse_mode="HTML")
-        else:
-            await bot.reply_to(message, f"咱只能更改由咱自己设置的管理员的头衔")
+        init_user_mention = f"<a href='tg://user?id={message.from_user.id}'>{message.from_user.first_name}</a>"
+        target_user_mention = f"<a href='tg://user?id={user_id}'>{message.reply_to_message.from_user.first_name}</a>"
+        await bot.reply_to(message, f"{init_user_mention} 把 {target_user_mention} 变成 {user_rank} !", parse_mode="HTML")
 
 
 async def inline_message(bot, query):
