@@ -2,6 +2,7 @@ import telebot
 import time
 import random
 from loguru import logger
+from Utils.Tool import remove_emoji
 
 
 async def call_anyone(bot, message):
@@ -50,6 +51,7 @@ async def appellation(bot, message, bot_id):
     successful_change = True
     if user_member.status == "member":
         await bot.promote_chat_member(message.chat.id, user_id, can_manage_chat=True)
+    user_rank = remove_emoji(user_rank)
     try:
         await bot.set_chat_administrator_custom_title(message.chat.id, user_id, user_rank)
     except Exception as e:
