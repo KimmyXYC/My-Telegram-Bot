@@ -32,7 +32,7 @@ async def handle_whois(bot, message):
 
 
 async def handle_dns(bot, message, record_type):
-    msg = await bot.reply_to(message, f"DNS lookup {message.text.split()[1]} as {record_type} ...", disable_web_page_preview=True)
+    msg = await bot.reply_to(message, f"DNS lookup {message.text.split()[1]} as {record_type.upper()} ...", disable_web_page_preview=True)
     status, result = await get_dns_info(message.text.split()[1], record_type)
     if not status:
         await bot.edit_message_text(f"请求失败: `{result}`", message.chat.id, msg.message_id, parse_mode="MarkdownV2")
