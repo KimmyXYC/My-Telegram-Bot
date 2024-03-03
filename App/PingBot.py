@@ -134,11 +134,11 @@ async def handle_ip(bot, message, _config):
             else:
                 ip_info += f"""`{data["as"]}`"""
         if data["mobile"]:
-            ip_info += f"""\n此 IP 可能为 **蜂窝移动数据 IP**"""
+            ip_info += f"""\n此 IP 可能为 *蜂窝移动数据 IP*"""
         if data["proxy"]:
-            ip_info += f"""\n此 IP 可能为 **代理 IP**"""
+            ip_info += f"""\n此 IP 可能为 *代理 IP*"""
         if data["hosting"]:
-            ip_info += f"""\n此 IP 可能为 **数据中心 IP**"""
+            ip_info += f"""\n此 IP 可能为 *数据中心 IP*"""
         await bot.edit_message_text(ip_info, message.chat.id, msg.message_id, parse_mode="MarkdownV2", disable_web_page_preview=True)
     else:
         if data["message"] == "reserved range":
