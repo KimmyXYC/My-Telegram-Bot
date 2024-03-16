@@ -7,3 +7,4 @@ requests>=2.31.0
 Pillow>=10.2.0
 elara>=0.5.5
 httpx>=0.26.0
+idna>=3.4

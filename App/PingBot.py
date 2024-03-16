@@ -98,6 +98,7 @@ async def handle_ip_ali(bot, message, _config):
 async def handle_ip(bot, message, _config):
     msg = await bot.reply_to(message, f"正在查询 {message.text.split()[1]} ...", disable_web_page_preview=True)
     url = message.text.split()[1]
+    url = convert_to_punycode(url)
     status, data = await ipapi_ip(url)
     if status:
         if url == data["query"]:

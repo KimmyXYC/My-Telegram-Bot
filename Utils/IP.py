@@ -6,6 +6,7 @@
 import ipaddress
 import socket
 import aiohttp
+import idna
 from loguru import logger
 
 
@@ -18,6 +19,15 @@ def check_url(url):
             return url, "v6"
     except ValueError:
         return get_ip_address(url), None
+
+
+def convert_to_punycode(domain):
+    try:
+        domain.encode('ascii')
+    except UnicodeEncodeError:
+        return idna.encode(domain).decode('ascii')
+    else:
+        return domain
 
 
 def get_ip_address(domain):
