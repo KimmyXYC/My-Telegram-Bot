@@ -12,7 +12,7 @@ async def handle_icp(bot, message):
     msg = await bot.reply_to(message, f"正在查询域名 {message.text.split()[1]} 备案信息...", disable_web_page_preview=True)
     status, data = await icp_record_check(message.text.split()[1])
     if not status:
-        await bot.reply_to(message, f"请求失败: `{data}`", parse_mode="MarkdownV2")
+        await bot.edit_message_text(message, f"请求失败: `{data}`", message.chat.id, msg.message_id, parse_mode="MarkdownV2")
         return
     if not data:
         icp_info = f"""查询目标:  `{message.text.split()[1]}`\n备案状态:  `未备案`"""
