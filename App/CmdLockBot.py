@@ -16,7 +16,7 @@ async def lock_command(bot, message, cmd, db):
         lock_cmd_list.append(cmd)
         db.set(str(message.chat.id), lock_cmd_list)
         logger.info(f"Lock Command: {cmd} in {message.chat.id}")
-        await bot.reply_to(message, f"已锁定命令`{cmd}`", parse_mode='Markdown')
+        await bot.reply_to(message, f"已锁定命令 `{cmd}` ", parse_mode='Markdown')
 
 
 async def unlock_command(bot, message, cmd, db):
@@ -27,7 +27,7 @@ async def unlock_command(bot, message, cmd, db):
         lock_cmd_list.remove(cmd)
         db.set(str(message.chat.id), lock_cmd_list)
         logger.info(f"Unlock Command: {cmd} in {message.chat.id}")
-        await bot.reply_to(message, f"已解锁命令`{cmd}`", parse_mode='Markdown')
+        await bot.reply_to(message, f"已解锁命令 `{cmd}` ", parse_mode='Markdown')
     else:
         await bot.reply_to(message, "该命令未被锁定")
 
