@@ -60,6 +60,10 @@ class BotRunner(object):
         async def handle_appellation(message):
             await Event.appellation(bot, message, self.bot_id)
 
+        @bot.message_handler(commands=['td'], chat_types=['group', 'supergroup'])
+        async def handle_appellation(message):
+            await Event.appellation_demote(bot, message, self.bot_id)
+
         @bot.message_handler(commands=['ip'])
         async def handle_ip(message):
             command_args = message.text.split()
