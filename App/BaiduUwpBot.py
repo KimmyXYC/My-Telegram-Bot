@@ -130,12 +130,12 @@ class BaiduUwp:
             surl, pwd = extract_link_and_password(parameter)
             root_list = await baidu.parse_list(surl, pwd)
             if root_list.error:
-                return await bot.edit_message_text(root_list.error_msg, msg.chat.id, msg.message_id)
+                return await bot.edit_message_text(root_list.error_msg, msg.chat.id, msg.message_id, parse_mode='Markdown')
             self.chat_data[f'bd_rlist_{mid}'] = root_list
             self.chat_data[f'bd_rlist_{mid}_root'] = root_list
 
             text, button = self.build_menu(root_list)
-            await bot.edit_message_text(text, msg.chat.id, msg.message_id, reply_markup=InlineKeyboardMarkup(button))
+            await bot.edit_message_text(text, msg.chat.id, msg.message_id, reply_markup=InlineKeyboardMarkup(button), parse_mode='Markdown')
         except Exception as e:
             await bot.edit_message_text(f'错误：{e}', msg.chat.id, msg.message_id)
 
@@ -178,6 +178,7 @@ class BaiduUwp:
             text,
             query.message.chat.id,
             query.message.message_id,
+            parse_mode='Markdown',
             reply_markup=InlineKeyboardMarkup(button)
         )
         await self.preloading(rlist, dir_list, mid)
@@ -244,7 +245,7 @@ User-Agent：`{dir_list.user_agent}`
                 fetch_failed.append(v.name)
 
         dirname = rlist.dirdata.src[-1].dirname if rlist.dirdata.src else '根目录'
-        await bot.edit_message_text(f'{dirname}|获取中...', query.message.chat.id, query.message.message_id)
+        await bot.edit_message_text(f'{dirname} | 获取中...', query.message.chat.id, query.message.message_id)
         a = [v for v in rlist.filedata if not v.isdir]
         with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
             futures = [executor.submit(asyncio.run, add_dl(v)) for v in a]
