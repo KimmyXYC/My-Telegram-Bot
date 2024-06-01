@@ -5,7 +5,7 @@ from loguru import logger
 from telebot import util
 from telebot.async_telebot import AsyncTeleBot
 from telebot.asyncio_storage import StateMemoryStorage
-from App import Event, PingBot, CmdLockBot, GoodNewsBot, BaiduUwpBot
+from App import Event, PingBot, CmdLockBot, NewsBot, BaiduUwpBot
 
 
 class BotRunner(object):
@@ -183,13 +183,13 @@ class BotRunner(object):
                         if command in lock_cmd_list:
                             await bot.delete_message(message.chat.id, message.message_id)
             elif message.text.startswith('喜报'):
-                await GoodNewsBot.good_news(bot, message, 0)
+                await NewsBot.good_news(bot, message, 0)
             elif message.text.startswith('悲报'):
-                await GoodNewsBot.good_news(bot, message, 1)
+                await NewsBot.good_news(bot, message, 1)
             elif message.text.startswith('通报'):
-                await GoodNewsBot.good_news(bot, message, 2)
+                await NewsBot.good_news(bot, message, 2)
             elif message.text.startswith('警报'):
-                await GoodNewsBot.good_news(bot, message, 3)
+                await NewsBot.good_news(bot, message, 3)
 
         @bot.inline_handler(lambda query: True)
         async def send_photo(query):

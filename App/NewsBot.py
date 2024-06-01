@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # @Time: 2023/11/11 20:13 
-# @FileName: GoodNewsBot.py
+# @FileName: NewsBot.py
 # @Software: PyCharm
 # @GitHub: KimmyXYC
 import textwrap
