@@ -34,27 +34,27 @@ class BotRunner(object):
         async def call_anyone(message):
             await Event.call_anyone(bot, message)
 
-        @bot.message_handler(commands=['bd'])
-        async def baidu_jx(message):
-            if message.chat.id not in self.baiduuwp.members:
-                return
-            await self.baidubot.start(bot, message)
-
-        @bot.callback_query_handler(func=lambda call: call.data.startswith('bd_'))
-        async def handle_baidu_list_callback_query(call):
-            await self.baidubot.baidu_list(bot, call)
-
-        @bot.callback_query_handler(func=lambda call: call.data.startswith('bdf_'))
-        async def handle_baidu_file_callback_query(call):
-            await self.baidubot.baidu_file(bot, call)
-
-        @bot.callback_query_handler(func=lambda call: call.data.startswith('bdAll_dl'))
-        async def handle_baidu_all_dl_callback_query(call):
-            await self.baidubot.baidu_all_dl(bot, call)
-
-        @bot.callback_query_handler(func=lambda call: call.data.startswith('bdexit'))
-        async def handle_baidu_exit_callback_query(call):
-            await self.baidubot.baidu_exit(bot, call)
+        # @bot.message_handler(commands=['bd'])
+        # async def baidu_jx(message):
+        #     if message.chat.id not in self.baiduuwp.members:
+        #         return
+        #     await self.baidubot.start(bot, message)
+        #
+        # @bot.callback_query_handler(func=lambda call: call.data.startswith('bd_'))
+        # async def handle_baidu_list_callback_query(call):
+        #     await self.baidubot.baidu_list(bot, call)
+        #
+        # @bot.callback_query_handler(func=lambda call: call.data.startswith('bdf_'))
+        # async def handle_baidu_file_callback_query(call):
+        #     await self.baidubot.baidu_file(bot, call)
+        #
+        # @bot.callback_query_handler(func=lambda call: call.data.startswith('bdAll_dl'))
+        # async def handle_baidu_all_dl_callback_query(call):
+        #     await self.baidubot.baidu_all_dl(bot, call)
+        #
+        # @bot.callback_query_handler(func=lambda call: call.data.startswith('bdexit'))
+        # async def handle_baidu_exit_callback_query(call):
+        #     await self.baidubot.baidu_exit(bot, call)
 
         @bot.message_handler(commands=['t'],chat_types=['group', 'supergroup'])
         async def handle_appellation(message):
