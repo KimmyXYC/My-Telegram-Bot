@@ -5,18 +5,16 @@ from loguru import logger
 from telebot import util
 from telebot.async_telebot import AsyncTeleBot
 from telebot.asyncio_storage import StateMemoryStorage
-from App import Event, PingBot, CmdLockBot, NewsBot, BaiduUwpBot
+from App import Event, PingBot, CmdLockBot, NewsBot
 
 
 class BotRunner(object):
     def __init__(self, config, db):
         self.bot = config.bot
         self.proxy = config.proxy
-        self.baiduuwp = config.baiduuwp
         self.config = config
         self.db = db
         self.bot_id = int(self.bot.botToken.split(':')[0])
-        self.baidubot = BaiduUwpBot.BaiduUwp(config.baiduuwp)
 
     def botcreate(self):
         bot = AsyncTeleBot(self.bot.botToken, state_storage=StateMemoryStorage())
@@ -33,28 +31,6 @@ class BotRunner(object):
         @bot.message_handler(commands=['calldoctor', 'callmtf', 'callpolice'])
         async def call_anyone(message):
             await Event.call_anyone(bot, message)
-
-        # @bot.message_handler(commands=['bd'])
-        # async def baidu_jx(message):
-        #     if message.chat.id not in self.baiduuwp.members:
-        #         return
-        #     await self.baidubot.start(bot, message)
-        #
-        # @bot.callback_query_handler(func=lambda call: call.data.startswith('bd_'))
-        # async def handle_baidu_list_callback_query(call):
-        #     await self.baidubot.baidu_list(bot, call)
-        #
-        # @bot.callback_query_handler(func=lambda call: call.data.startswith('bdf_'))
-        # async def handle_baidu_file_callback_query(call):
-        #     await self.baidubot.baidu_file(bot, call)
-        #
-        # @bot.callback_query_handler(func=lambda call: call.data.startswith('bdAll_dl'))
-        # async def handle_baidu_all_dl_callback_query(call):
-        #     await self.baidubot.baidu_all_dl(bot, call)
-        #
-        # @bot.callback_query_handler(func=lambda call: call.data.startswith('bdexit'))
-        # async def handle_baidu_exit_callback_query(call):
-        #     await self.baidubot.baidu_exit(bot, call)
 
         @bot.message_handler(commands=['t'],chat_types=['group', 'supergroup'])
         async def handle_appellation(message):
@@ -182,14 +158,15 @@ class BotRunner(object):
                             lock_cmd_list = []
                         if command in lock_cmd_list:
                             await bot.delete_message(message.chat.id, message.message_id)
-            elif message.text.startswith('喜报'):
-                await NewsBot.good_news(bot, message, 0)
-            elif message.text.startswith('悲报'):
-                await NewsBot.good_news(bot, message, 1)
-            elif message.text.startswith('通报'):
-                await NewsBot.good_news(bot, message, 2)
-            elif message.text.startswith('警报'):
-                await NewsBot.good_news(bot, message, 3)
+            elif message.text.startswith(('喜报', '悲报', '通报', '警报')):
+                if message.text.startswith('喜报'):
+                    await NewsBot.good_news(bot, message, 0)
+                elif message.text.startswith('悲报'):
+                    await NewsBot.good_news(bot, message, 1)
+                elif message.text.startswith('通报'):
+                    await NewsBot.good_news(bot, message, 2)
+                elif message.text.startswith('警报'):
+                    await NewsBot.good_news(bot, message, 3)
 
         @bot.inline_handler(lambda query: True)
         async def send_photo(query):

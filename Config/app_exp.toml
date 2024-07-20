@@ -9,10 +9,3 @@ url = "http://127.0.0.1:7890"
 
 [ip]
 appcode = ""
-
-[baiduuwp]
-members = [100, -100200]
-baidu_version = '4'
-baidu_url = 'https://baidu.example.com'
-baidu_password = 'password'
-ad_info = ""
