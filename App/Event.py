@@ -40,7 +40,8 @@ async def shorten_url(bot, message, config, url, short=""):
             disable_web_page_preview=True,
         )
     else:
-        if url.startswith("https://") or url.startswith("http://"):
+        if not (url.startswith("https://") or url.startswith("http://")):
+            url = "http://" + url
             if short:
                 params = {'url': url, 'short': short, 'encode': 'json'}
             else:
@@ -54,7 +55,6 @@ async def shorten_url(bot, message, config, url, short=""):
                         else:
                             text_data = await response.text()
                             json_data = json.loads(text_data)
-                _info = "短链接: "
                 if json_data["code"] == 0:
                     _url = json_data['url']
                     _status = True
@@ -65,7 +65,7 @@ async def shorten_url(bot, message, config, url, short=""):
                     logger.success(f"[Short URL][{message.chat.id}]: Get Short URL: {_url}")
                     await bot.reply_to(
                         message,
-                        f"{_info}`{_url}`",
+                        f"短链接: {_url}`",
                         disable_web_page_preview=True,
                         parse_mode="Markdown",
                     )
@@ -73,23 +73,18 @@ async def shorten_url(bot, message, config, url, short=""):
                     logger.error(f"[Short URL][{message.chat.id}]: Can't Get Short URL: {_url}")
                     await bot.reply_to(
                         message,
-                        f"生成失败: {_url}",
+                        f"生成失败: `{_url}`",
                         disable_web_page_preview=True,
+                        parse_mode="Markdown",
                     )
             except Exception as e:
                 logger.error(f"[Short URL][{message.chat.id}]: Can't Get Short URL: {e}")
                 await bot.reply_to(
                     message,
-                    f"生成失败, 请检查后端地址是否有效: {e}",
+                    f"生成失败, 请检查后端地址是否有效: `{e}`",
                     disable_web_page_preview=True,
+                    parse_mode="Markdown",
                 )
-        else:
-            logger.error(f"[Short URL][{message.chat.id}]: Not Effective URL")
-            await bot.reply_to(
-                message,
-                f"非法的网址",
-                disable_web_page_preview=True,
-            )
 
 
 async def appellation(bot, message, bot_id):
