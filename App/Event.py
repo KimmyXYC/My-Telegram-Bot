@@ -33,7 +33,7 @@ async def call_anyone(bot, message):
 async def shorten_url(bot, message, config, url, short=""):
     server = config["server"]
     if server == "":
-        logger.error(f"User ID: {message.chat.id}  Backend Address Not Set")
+        logger.error(f"[Short URL][{message.chat.id}]: Backend Address Not Set")
         await bot.reply_to(
             message,
             f"生成失败, 后端地址未设置",
@@ -62,7 +62,7 @@ async def shorten_url(bot, message, config, url, short=""):
                     _url = json_data['msg']
                     _status = False
                 if _status:
-                    logger.success(f"User ID: {message.chat.id}  Get Short URL: {_url}")
+                    logger.success(f"[Short URL][{message.chat.id}]: Get Short URL: {_url}")
                     await bot.reply_to(
                         message,
                         f"{_info}`{_url}`",
@@ -70,21 +70,21 @@ async def shorten_url(bot, message, config, url, short=""):
                         parse_mode="Markdown",
                     )
                 else:
-                    logger.error(f"User ID: {message.chat.id}  Can't Get Short URL: {_url}")
+                    logger.error(f"[Short URL][{message.chat.id}]: Can't Get Short URL: {_url}")
                     await bot.reply_to(
                         message,
                         f"生成失败: {_url}",
                         disable_web_page_preview=True,
                     )
             except Exception as e:
-                logger.error(f"User ID: {message.chat.id}  Can't Get Short URL: {e}")
+                logger.error(f"[Short URL][{message.chat.id}]: Can't Get Short URL: {e}")
                 await bot.reply_to(
                     message,
                     f"生成失败, 请检查后端地址是否有效: {e}",
                     disable_web_page_preview=True,
                 )
         else:
-            logger.error(f"User ID: {message.chat.id}  Not Effective URL")
+            logger.error(f"[Short URL][{message.chat.id}]: Not Effective URL")
             await bot.reply_to(
                 message,
                 f"非法的网址",
@@ -122,7 +122,7 @@ async def appellation(bot, message, bot_id):
         try:
             await bot.promote_chat_member(message.chat.id, user_id, can_manage_chat=True)
         except Exception as e:
-            logger.error(e)
+            logger.error(f"[Rank][{message.chat.id}]: {e}")
             error_message = str(e)
             start_index = error_message.find("Bad Request: ")
             if start_index != -1:
@@ -133,7 +133,7 @@ async def appellation(bot, message, bot_id):
     try:
         await bot.set_chat_administrator_custom_title(message.chat.id, user_id, user_rank)
     except Exception as e:
-        logger.error(e)
+        logger.error(f"[Rank][{message.chat.id}]: {e}")
         error_message = str(e)
         if ("not enough rights to change custom title of the user" in error_message
                 or " only creator can edit their custom title" in error_message):
@@ -170,7 +170,7 @@ async def appellation_demote(bot, message, bot_id):
             await bot.promote_chat_member(message.chat.id, user_id, can_manage_chat=False)
             await bot.reply_to(message, "好, 你现在没有头衔啦")
         except Exception as e:
-            logger.error(e)
+            logger.error(f"[Rank][{message.chat.id}]: {e}")
             error_message = str(e)
             if "CHAT_ADMIN_REQUIRED" in error_message:
                 await bot.reply_to(message, "咱只能更改由咱自己设置的管理员的头衔喵")
@@ -200,7 +200,7 @@ async def appellation_demote(bot, message, bot_id):
             target_user_mention = f"<a href='tg://user?id={user_id}'>{message.reply_to_message.from_user.first_name}</a>"
             await bot.reply_to(message, f"{init_user_mention} 把 {target_user_mention} 变成 RBQ!", parse_mode="HTML")
         except Exception as e:
-            logger.error(e)
+            logger.error(f"[Rank][{message.chat.id}]: {e}")
             error_message = str(e)
             if "CHAT_ADMIN_REQUIRED" in error_message:
                 await bot.reply_to(message, "咱只能更改由咱自己设置的管理员的头衔喵")
