@@ -32,13 +32,28 @@ class BotRunner(object):
         async def call_anyone(message):
             await Event.call_anyone(bot, message)
 
-        @bot.message_handler(commands=['t'],chat_types=['group', 'supergroup'])
+        @bot.message_handler(commands=['t'], chat_types=['group', 'supergroup'])
         async def handle_appellation(message):
             await Event.appellation(bot, message, self.bot_id)
 
         @bot.message_handler(commands=['td'], chat_types=['group', 'supergroup'])
         async def handle_appellation(message):
             await Event.appellation_demote(bot, message, self.bot_id)
+
+        @bot.message_handler(commands=["short"])
+        async def handle_command(message):
+            command_args = message.text.split()
+            if len(command_args) == 1:
+                await bot.reply_to(message, "格式错误, 格式应为 /short [URL] (short)")
+            elif len(command_args) == 2:
+                url = command_args[1]
+                await Event.shorten_url(bot, message, self.config.shorturl, url)
+            elif len(command_args) == 3:
+                url = command_args[1]
+                short = command_args[2]
+                await Event.shorten_url(bot, message, self.config.shorturl, url, short)
+            else:
+                await bot.reply_to(message, "格式错误, 格式应为 /short [URL] (short)")
 
         @bot.message_handler(commands=['ip'])
         async def handle_ip(message):

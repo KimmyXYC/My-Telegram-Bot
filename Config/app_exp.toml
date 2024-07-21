@@ -9,3 +9,6 @@ url = "http://127.0.0.1:7890"
 
 [ip]
 appcode = ""
+
+[shorturl]
+server = "https://example.com/api/url"

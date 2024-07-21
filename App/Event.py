@@ -1,6 +1,8 @@
 import telebot
 import time
+import json
 import random
+import aiohttp
 from loguru import logger
 from Utils.Tool import remove_emoji
 
@@ -26,6 +28,68 @@ async def call_anyone(bot, message):
             consecutive_count = 1
         anyone_msg += emoji
     await bot.reply_to(message, anyone_msg)
+
+
+async def shorten_url(bot, message, config, url, short=""):
+    server = config["server"]
+    if server == "":
+        logger.error(f"User ID: {message.chat.id}  Backend Address Not Set")
+        await bot.reply_to(
+            message,
+            f"生成失败, 后端地址未设置",
+            disable_web_page_preview=True,
+        )
+    else:
+        if url.startswith("https://") or url.startswith("http://"):
+            if short:
+                params = {'url': url, 'short': short, 'encode': 'json'}
+            else:
+                params = {'url': url, 'encode': 'json'}
+            try:
+                timeout = aiohttp.ClientTimeout(total=5)
+                async with aiohttp.ClientSession(timeout=timeout) as session:
+                    async with session.post(server, params=params) as response:
+                        if 'application/json' in response.headers['content-type']:
+                            json_data = await response.json()
+                        else:
+                            text_data = await response.text()
+                            json_data = json.loads(text_data)
+                _info = "短链接: "
+                if json_data["code"] == 0:
+                    _url = json_data['url']
+                    _status = True
+                else:
+                    _url = json_data['msg']
+                    _status = False
+                if _status:
+                    logger.success(f"User ID: {message.chat.id}  Get Short URL: {_url}")
+                    await bot.reply_to(
+                        message,
+                        f"{_info}`{_url}`",
+                        disable_web_page_preview=True,
+                        parse_mode="Markdown",
+                    )
+                else:
+                    logger.error(f"User ID: {message.chat.id}  Can't Get Short URL: {_url}")
+                    await bot.reply_to(
+                        message,
+                        f"生成失败: {_url}",
+                        disable_web_page_preview=True,
+                    )
+            except Exception as e:
+                logger.error(f"User ID: {message.chat.id}  Can't Get Short URL: {e}")
+                await bot.reply_to(
+                    message,
+                    f"生成失败, 请检查后端地址是否有效: {e}",
+                    disable_web_page_preview=True,
+                )
+        else:
+            logger.error(f"User ID: {message.chat.id}  Not Effective URL")
+            await bot.reply_to(
+                message,
+                f"非法的网址",
+                disable_web_page_preview=True,
+            )
 
 
 async def appellation(bot, message, bot_id):
