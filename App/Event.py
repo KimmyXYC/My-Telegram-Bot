@@ -65,7 +65,7 @@ async def shorten_url(bot, message, config, url, short=""):
                     logger.success(f"[Short URL][{message.chat.id}]: Get Short URL: {_url}")
                     await bot.reply_to(
                         message,
-                        f"短链接: {_url}`",
+                        f"短链接: `{_url}`",
                         disable_web_page_preview=True,
                         parse_mode="Markdown",
                     )
