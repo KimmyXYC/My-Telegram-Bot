@@ -3,9 +3,9 @@ import telebot
 import re
 from loguru import logger
 from telebot import util
-from telebot import asyncio_filters
 from telebot.async_telebot import AsyncTeleBot
 from telebot.asyncio_storage import StateMemoryStorage
+from telebot.asyncio_filters import SimpleCustomFilter
 from App import Event, PingBot, CmdLockBot, NewsBot
 
 
@@ -28,9 +28,6 @@ class BotRunner(object):
             from telebot import asyncio_helper
             asyncio_helper.proxy = self.proxy.url
             logger.success("Proxy Set")
-
-        bot.add_custom_filter(StartsWithFilter())
-        bot.add_custom_filter(CommandInChatFilter())
 
         @bot.message_handler(commands=['calldoctor', 'callmtf', 'callpolice'])
         async def call_anyone(message):
@@ -189,6 +186,8 @@ class BotRunner(object):
         bot.add_custom_filter(asyncio_filters.IsAdminFilter(bot))
         bot.add_custom_filter(asyncio_filters.ChatFilter())
         bot.add_custom_filter(asyncio_filters.StateFilter(bot))
+        bot.add_custom_filter(StartsWithFilter())
+        bot.add_custom_filter(CommandInChatFilter())
 
         async def main():
             await asyncio.gather(bot.polling(non_stop=True, allowed_updates=util.update_types))
@@ -196,14 +195,14 @@ class BotRunner(object):
         asyncio.run(main())
 
 
-class StartsWithFilter(asyncio_filters.SimpleCustomFilter):
+class StartsWithFilter(SimpleCustomFilter):
     key = 'starts_with_alarm'
 
     async def check(self, message):
         return message.text.startswith(('喜报', '悲报', '通报', '警报'))
 
 
-class CommandInChatFilter(asyncio_filters.SimpleCustomFilter):
+class CommandInChatFilter(SimpleCustomFilter):
     key = 'command_in_group'
 
     async def check(self, message):
