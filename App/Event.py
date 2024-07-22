@@ -2,6 +2,7 @@ import telebot
 import time
 import json
 import random
+import re
 import aiohttp
 from loguru import logger
 from Utils.Tool import remove_emoji
@@ -85,6 +86,14 @@ async def shorten_url(bot, message, config, url, short=""):
                     disable_web_page_preview=True,
                     parse_mode="Markdown",
                 )
+
+
+async def handle_xiatou(bot, message, count):
+    pattern = r"(?:舔|嗦|啃|舔舐|舔舔|舔舐|吻|嘬)(?:(?:萝莉|幼女|云漓|克拉拉|小格雷修|小女孩|小姑娘|女童|幼童)(?:的)?(?:脚|jio|足|狱卒|嫩足|脚丫子|脚丫|脚趾头|玉足|裸足))|(?:萝莉|幼女|小女孩|小姑娘|女童|幼童)\s*(?:脚|jio|足|狱卒|嫩足|脚丫子|脚丫|脚趾头|玉足|裸足)\s*(?:给我|放进|想|感觉|看着)|(?:jio|脚|狱卒|玉足|足|脚丫|脚丫子|脚趾|脚趾头|嫩足|裸足|小脚|小足|脚板|脚掌|脚背|足尖|脚丫丫)|(?:放*嘴里)"
+    if re.search(pattern, message.text, re.IGNORECASE):
+        await bot.reply_to(message, f"#下头\ninb 老师，这是你今天第 {count+1} 次下头")
+        return True
+    return False
 
 
 async def appellation(bot, message, bot_id):

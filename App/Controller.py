@@ -1,11 +1,13 @@
 import asyncio
 import telebot
 import re
+import time
+from datetime import datetime
 from loguru import logger
-from telebot import util
+from telebot import util, types
 from telebot.async_telebot import AsyncTeleBot
 from telebot.asyncio_storage import StateMemoryStorage
-from telebot.asyncio_filters import SimpleCustomFilter
+from telebot.asyncio_filters import SimpleCustomFilter, AdvancedCustomFilter
 from App import Event, PingBot, CmdLockBot, NewsBot
 
 
@@ -178,6 +180,20 @@ class BotRunner(object):
                 if command in lock_cmd_list:
                     await bot.delete_message(message.chat.id, message.message_id)
 
+        @bot.message_handler(user_id=self.config.xiatou["id"], content_types=['text'])
+        async def handle_xiatou(message):
+            count_db = self.db.get("inb")
+            if count_db is None:
+                count_db = [int(time.time()), 0]
+            db_time = datetime.fromtimestamp(count_db[0])
+            now_time = datetime.now()
+            if db_time.day != now_time.day:
+                count_db = [int(time.time()), 0]
+            self.db.set("inb", count_db)
+            if await Event.handle_xiatou(bot, message, count_db[1]):
+                count_db[1] += 1
+                self.db.set("inb", count_db)
+
         @bot.inline_handler(lambda query: True)
         async def send_photo(query):
             await Event.inline_message(bot, query)
@@ -188,6 +204,7 @@ class BotRunner(object):
         bot.add_custom_filter(asyncio_filters.StateFilter(bot))
         bot.add_custom_filter(StartsWithFilter())
         bot.add_custom_filter(CommandInChatFilter())
+        bot.add_custom_filter(UserFilter())
 
         async def main():
             await asyncio.gather(bot.polling(non_stop=True, allowed_updates=util.update_types))
@@ -207,3 +224,10 @@ class CommandInChatFilter(SimpleCustomFilter):
 
     async def check(self, message):
         return message.chat.type in ['group', 'supergroup'] and message.text.startswith('/')
+
+
+class UserFilter(AdvancedCustomFilter):
+    key = 'user_id'
+
+    async def check(self, message, text):
+        return message.from_user.id in text

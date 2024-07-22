@@ -12,3 +12,6 @@ appcode = ""
 
 [shorturl]
 server = "https://example.com/api/url"
+
+[xiatou]
+id = [123,456]
