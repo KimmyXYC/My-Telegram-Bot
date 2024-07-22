@@ -3,6 +3,7 @@ import telebot
 import re
 from loguru import logger
 from telebot import util
+from telebot import asyncio_filters
 from telebot.async_telebot import AsyncTeleBot
 from telebot.asyncio_storage import StateMemoryStorage
 from App import Event, PingBot, CmdLockBot, NewsBot
@@ -27,6 +28,9 @@ class BotRunner(object):
             from telebot import asyncio_helper
             asyncio_helper.proxy = self.proxy.url
             logger.success("Proxy Set")
+
+        bot.add_custom_filter(StartsWithFilter())
+        bot.add_custom_filter(CommandInChatFilter())
 
         @bot.message_handler(commands=['calldoctor', 'callmtf', 'callpolice'])
         async def call_anyone(message):
@@ -161,27 +165,21 @@ class BotRunner(object):
             else:
                 await bot.reply_to(message, "请在群组中使用此功能")
 
-        @bot.message_handler(func=lambda message: message.chat.type in ['group', 'supergroup', 'private'], content_types=['text'])
+        @bot.message_handler(starts_with_alarm=True)
+        async def handle_specific_start(message):
+            type_dict = {"喜报": 0, "悲报": 1, "通报": 2, "警报": 3}
+            await NewsBot.good_news(bot, message, type_dict[message.text[:2]])
+
+        @bot.message_handler(command_in_group=True, content_types=['text'])
         async def handle_commands(message):
-            if message.text.startswith('/'):
-                if message.chat.type in ['group', 'supergroup']:
-                    if self.db.exists(str(message.chat.id)):
-                        command = re.split(r'[@\s]+', message.text.lower())[0]
-                        command = command[1:]
-                        lock_cmd_list = self.db.get(str(message.chat.id))
-                        if lock_cmd_list is None:
-                            lock_cmd_list = []
-                        if command in lock_cmd_list:
-                            await bot.delete_message(message.chat.id, message.message_id)
-            elif message.text.startswith(('喜报', '悲报', '通报', '警报')):
-                if message.text.startswith('喜报'):
-                    await NewsBot.good_news(bot, message, 0)
-                elif message.text.startswith('悲报'):
-                    await NewsBot.good_news(bot, message, 1)
-                elif message.text.startswith('通报'):
-                    await NewsBot.good_news(bot, message, 2)
-                elif message.text.startswith('警报'):
-                    await NewsBot.good_news(bot, message, 3)
+            if self.db.exists(str(message.chat.id)):
+                command = re.split(r'[@\s]+', message.text.lower())[0]
+                command = command[1:]
+                lock_cmd_list = self.db.get(str(message.chat.id))
+                if lock_cmd_list is None:
+                    lock_cmd_list = []
+                if command in lock_cmd_list:
+                    await bot.delete_message(message.chat.id, message.message_id)
 
         @bot.inline_handler(lambda query: True)
         async def send_photo(query):
@@ -196,3 +194,17 @@ class BotRunner(object):
             await asyncio.gather(bot.polling(non_stop=True, allowed_updates=util.update_types))
 
         asyncio.run(main())
+
+
+class StartsWithFilter(asyncio_filters.SimpleCustomFilter):
+    key = 'starts_with_alarm'
+
+    async def check(self, message):
+        return message.text.startswith(('喜报', '悲报', '通报', '警报'))
+
+
+class CommandInChatFilter(asyncio_filters.SimpleCustomFilter):
+    key = 'command_in_group'
+
+    async def check(self, message):
+        return message.chat.type in ['group', 'supergroup'] and message.text.startswith('/')
