@@ -2,7 +2,7 @@ import asyncio
 import telebot
 import re
 import time
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from loguru import logger
 from telebot import util, types
 from telebot.async_telebot import AsyncTeleBot
@@ -185,8 +185,9 @@ class BotRunner(object):
             count_db = self.db.get("inb")
             if count_db is None:
                 count_db = [int(time.time()), 0]
-            db_time = datetime.fromtimestamp(count_db[0])
-            now_time = datetime.now()
+            utc_plus_8 = timezone(timedelta(hours=8))
+            db_time = datetime.fromtimestamp(count_db[0]).astimezone(utc_plus_8)
+            now_time = datetime.now().astimezone(utc_plus_8)
             if db_time.day != now_time.day:
                 count_db = [int(time.time()), 0]
             self.db.set("inb", count_db)
