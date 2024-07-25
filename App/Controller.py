@@ -191,7 +191,7 @@ class BotRunner(object):
             if db_time.day != now_time.day:
                 count_db = [int(time.time()), 0]
             self.db.set("inb", count_db)
-            if await Event.handle_xiatou(bot, message, count_db[1]):
+            if await Event.handle_xiatou(bot, message, count_db[1], self.config.xiatou):
                 count_db[1] += 1
                 self.db.set("inb", count_db)
 
