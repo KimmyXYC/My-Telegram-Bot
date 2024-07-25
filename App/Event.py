@@ -104,10 +104,9 @@ async def handle_xiatou(bot, message, count, config):
     else:
         pattern = r".*(?:脚|足).*"
         if re.search(pattern, text_content, re.IGNORECASE):
-            url = f"https://api.cloudflare.com/client/v4/accounts/{config["cloudflare_account_id"]}/ai/run/@cf/qwen/qwen1.5-14b-chat-awq"
+            url = f"https://api.cloudflare.com/client/v4/accounts/{config['cloudflare_account_id']}/ai/run/@cf/qwen/qwen1.5-14b-chat-awq"
             headers = {
-                "Authorization": f"Bearer {config["cloudflare_auth_token"]}"
-
+                "Authorization": f"Bearer {config['cloudflare_auth_token']}"
             }
             data = {
                 "messages": [
