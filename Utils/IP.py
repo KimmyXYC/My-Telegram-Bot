@@ -85,7 +85,6 @@ async def kimmy_ip(ip_addr):
 async def ipapi_ip(ip_addr):
     url = f"http://ip-api.com/json/{ip_addr}"
     params = {"fields": "status,message,country,regionName,city,lat,lon,isp,org,as,mobile,proxy,hosting,query"}
-
     async with aiohttp.ClientSession() as session:
         async with session.get(url, params=params) as response:
             if response.status == 200:

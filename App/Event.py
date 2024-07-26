@@ -102,7 +102,7 @@ async def handle_xiatou(bot, message, count, config):
         await bot.reply_to(message, f"#下头\ninb 老师，这是你今天第 {count+1} 次下头")
         return True
     else:
-        pattern = r".*(?:脚|足).*"
+        pattern = r".*(?:脚|足|萝莉).*"
         if re.search(pattern, text_content, re.IGNORECASE):
             url = f"https://api.cloudflare.com/client/v4/accounts/{config['cloudflare_account_id']}/ai/run/@cf/qwen/qwen1.5-14b-chat-awq"
             headers = {

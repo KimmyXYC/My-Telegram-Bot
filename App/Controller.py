@@ -2,6 +2,8 @@ import asyncio
 import telebot
 import re
 import time
+import psutil
+import platform
 from datetime import datetime, timedelta, timezone
 from loguru import logger
 from telebot import util, types
@@ -30,6 +32,32 @@ class BotRunner(object):
             from telebot import asyncio_helper
             asyncio_helper.proxy = self.proxy.url
             logger.success("Proxy Set")
+
+        @bot.message_handler(user_id=self.config.bot["master"], commands=['info'])
+        async def handle_info(message):
+            os_info = platform.platform()
+            cpu_usage = psutil.cpu_percent(interval=1)
+            memory_info = psutil.virtual_memory()
+            swap_info = psutil.swap_memory()
+            disk_info = psutil.disk_usage('/')
+            net_io = psutil.net_io_counters()
+            load_avg = psutil.getloadavg()
+
+            info_message = (
+                f"*Operating System:* {os_info}\n"
+                f"*CPU Usage:* {cpu_usage}%\n"
+                f"*Memory Usage:* {memory_info.percent}% (Total: {memory_info.total / (1024 ** 3):.2f} GB, "
+                f"Used: {memory_info.used / (1024 ** 3):.2f} GB)\n"
+                f"*Swap Usage:* {swap_info.percent}% (Total: {swap_info.total / (1024 ** 3):.2f} GB, "
+                f"Used: {swap_info.used / (1024 ** 3):.2f} GB)\n"
+                f"*Disk Usage:* {disk_info.percent}% (Total: {disk_info.total / (1024 ** 3):.2f} GB, "
+                f"Used: {disk_info.used / (1024 ** 3):.2f} GB)\n"
+                f"*Network I/O:* Sent: {net_io.bytes_sent / (1024 ** 2):.2f} MB, "
+                f"Received: {net_io.bytes_recv / (1024 ** 2):.2f} MB\n"
+                f"*Load Average:* 1 min: {load_avg[0]:.2f}, 5 min: {load_avg[1]:.2f}, 15 min: {load_avg[2]:.2f}"
+            )
+
+            await bot.reply_to(message, info_message, parse_mode='Markdown')
 
         @bot.message_handler(commands=['calldoctor', 'callmtf', 'callpolice'])
         async def call_anyone(message):

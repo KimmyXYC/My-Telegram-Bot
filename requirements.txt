@@ -8,3 +8,4 @@ Pillow>=10.3.0
 elara>=0.5.5
 idna>=3.7
 emoji>=2.10.1
+psutil>=6.0.0
