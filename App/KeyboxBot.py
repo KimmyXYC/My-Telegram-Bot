@@ -60,18 +60,17 @@ def parse_certificates(xml_file, pem_number):
 async def keybox_check(bot, message, document):
     file_info = await bot.get_file(document.file_id)
     downloaded_file = await bot.download_file(file_info.file_path)
-
-    # with tempfile.NamedTemporaryFile(dir="downloads", delete=True) as temp_file:
-    #     temp_file.write(downloaded_file)
-    #     temp_file.flush()
-    file_path = f"downloads/{document.file_id}.xml"
-    with open(file_path, 'wb') as new_file:
-        new_file.write(downloaded_file)
+    # file_path = f"downloads/{document.file_id}.xml"
+    # with open(file_path, 'wb') as new_file:
+    #     new_file.write(downloaded_file)
+    with tempfile.NamedTemporaryFile(dir="downloads", delete=True) as temp_file:
+        temp_file.write(downloaded_file)
+        temp_file.flush()
         try:
-            # pem_number = parse_number_of_certificates(temp_file.name)
-            # pem_certificates = parse_certificates(temp_file.name, pem_number)
-            pem_number = parse_number_of_certificates(file_path)
-            pem_certificates = parse_certificates(file_path, pem_number)
+            pem_number = parse_number_of_certificates(temp_file.name)
+            pem_certificates = parse_certificates(temp_file.name, pem_number)
+            # pem_number = parse_number_of_certificates(file_path)
+            # pem_certificates = parse_certificates(file_path, pem_number)
         except Exception as e:
             logger.error(f"[Keybox Check][message.chat.id]: {e}")
             await bot.reply_to(message, e)
