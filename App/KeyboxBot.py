@@ -64,7 +64,7 @@ async def keybox_check(bot, message, document):
         return
     serial_number = certificate.serial_number
     serial_number_string = hex(serial_number)[2:].lower()
-    reply = f"Serial number: `{serial_number_string}`"
+    reply = f"*Serial number:* `{serial_number_string}`"
     try:
         status_json = await load_from_url()
     except Exception:
@@ -74,5 +74,5 @@ async def keybox_check(bot, message, document):
     if status is None:
         reply += "\n✅ Serial number not found in Google's revoked keybox list"
     else:
-        reply += f"\n❌ Serial number found in Google's revoked keybox list\nReason: `{status['reason']}`"
+        reply += f"\n❌ Serial number found in Google's revoked keybox list\n*Reason:* `{status['reason']}`"
     await bot.reply_to(message, reply, parse_mode='Markdown')
