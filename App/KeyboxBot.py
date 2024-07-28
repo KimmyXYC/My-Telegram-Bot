@@ -102,7 +102,7 @@ async def keybox_check(bot, message, document):
         son_certificate = x509.load_pem_x509_certificate(pem_certificates[i].encode(), default_backend())
         mother_certificate = x509.load_pem_x509_certificate(pem_certificates[i + 1].encode(), default_backend())
 
-        if son_certificate.issuer != mother_certificate.issuer:
+        if son_certificate.issuer != mother_certificate.subject:
             flag = False
             break
     if flag:
