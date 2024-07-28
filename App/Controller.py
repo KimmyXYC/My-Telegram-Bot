@@ -10,7 +10,7 @@ from telebot import util, types
 from telebot.async_telebot import AsyncTeleBot
 from telebot.asyncio_storage import StateMemoryStorage
 from telebot.asyncio_filters import SimpleCustomFilter, AdvancedCustomFilter
-from App import Event, PingBot, CmdLockBot, NewsBot
+from App import Event, PingBot, CmdLockBot, NewsBot, KeyboxBot
 
 
 class BotRunner(object):
@@ -62,6 +62,20 @@ class BotRunner(object):
         @bot.message_handler(commands=['calldoctor', 'callmtf', 'callpolice'])
         async def call_anyone(message):
             await Event.call_anyone(bot, message)
+
+        @bot.message_handler(commands=['check'])
+        async def handle_keybox_check(message):
+            if message.reply_to_message and message.reply_to_message.document:
+                document = message.reply_to_message.document
+                if document.mime_type != 'application/xml' and document.mime_type != 'text/xml':
+                    await bot.reply_to(message, "File format error")
+                    return
+                if document.file_size > 20 * 1024:
+                    await bot.reply_to(message, "File size is too large")
+                    return
+                await KeyboxBot.keybox_check(bot, message, document)
+            else:
+                await bot.reply_to(message, "Please reply to a keybox.xml file")
 
         @bot.message_handler(commands=['t'], chat_types=['group', 'supergroup'])
         async def handle_appellation(message):

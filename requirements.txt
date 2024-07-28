@@ -9,3 +9,4 @@ elara>=0.5.5
 idna>=3.7
 emoji>=2.10.1
 psutil>=6.0.0
+cryptography>=43.0.0
