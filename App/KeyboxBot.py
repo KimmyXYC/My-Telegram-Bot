@@ -8,6 +8,7 @@ import json
 import tempfile
 import xml.etree.ElementTree as ET
 from loguru import logger
+from datetime import datetime
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 
@@ -65,6 +66,16 @@ async def keybox_check(bot, message, document):
     serial_number = certificate.serial_number
     serial_number_string = hex(serial_number)[2:].lower()
     reply = f"*Serial number:* `{serial_number_string}`"
+    not_valid_before = certificate.not_valid_before
+    not_valid_after = certificate.not_valid_after
+    current_time = datetime.utcnow()
+    is_valid = not_valid_before <= current_time <= not_valid_after
+    if is_valid:
+        reply += "\n✅ Certificate within validity period"
+    elif current_time > not_valid_after:
+        reply += "\n❌ Expired certificate"
+    else:
+        reply += "\n❌ Invalid certificate"
     try:
         status_json = await load_from_url()
     except Exception:
