@@ -72,7 +72,7 @@ async def keybox_check(bot, message, document):
             status_json = json.load(file)
     status = status_json['entries'].get(serial_number_string, None)
     if status is None:
-        reply += "\nSerial number not found in Google's revoked keybox list"
+        reply += "\n✅Serial number not found in Google's revoked keybox list"
     else:
-        reply += f"\nSerial number found in Google's revoked keybox list\nReason: `{status['reason']}`"
+        reply += f"\n❌Serial number found in Google's revoked keybox list\nReason: `{status['reason']}`"
     await bot.reply_to(message, reply, parse_mode='Markdown')
