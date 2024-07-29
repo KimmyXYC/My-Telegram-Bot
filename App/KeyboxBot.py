@@ -11,7 +11,7 @@ from loguru import logger
 from datetime import datetime
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, ec
 
 
@@ -57,20 +57,34 @@ def parse_certificates(xml_file, pem_number):
         raise Exception("No Certificate found.")
 
 
+def load_public_key_from_file(file_path):
+    with open(file_path, 'rb') as key_file:
+        public_key = serialization.load_pem_public_key(
+            key_file.read(),
+            backend=default_backend()
+        )
+    return public_key
+
+
+def compare_keys(public_key1, public_key2):
+    return public_key1.public_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PublicFormat.SubjectPublicKeyInfo
+    ) == public_key2.public_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PublicFormat.SubjectPublicKeyInfo
+    )
+
+
 async def keybox_check(bot, message, document):
     file_info = await bot.get_file(document.file_id)
     downloaded_file = await bot.download_file(file_info.file_path)
-    # file_path = f"downloads/{document.file_id}.xml"
-    # with open(file_path, 'wb') as new_file:
-    #     new_file.write(downloaded_file)
     with tempfile.NamedTemporaryFile(dir="downloads", delete=True) as temp_file:
         temp_file.write(downloaded_file)
         temp_file.flush()
         try:
             pem_number = parse_number_of_certificates(temp_file.name)
             pem_certificates = parse_certificates(temp_file.name, pem_number)
-            # pem_number = parse_number_of_certificates(file_path)
-            # pem_certificates = parse_certificates(file_path, pem_number)
         except Exception as e:
             logger.error(f"[Keybox Check][message.chat.id]: {e}")
             await bot.reply_to(message, e)
@@ -140,9 +154,27 @@ async def keybox_check(bot, message, document):
             flag = False
             break
     if flag:
-        reply += f"\n✅ Effective key chain"
+        reply += f"\n✅ Valid keychain"
     else:
         reply += f"\n❌ Invalid keychain"
+
+    # Root Certificate Validation
+    root_certificate = x509.load_pem_x509_certificate(pem_certificates[-1].encode(), default_backend())
+    root_public_key = root_certificate.public_key()
+    google_public_key = load_public_key_from_file("res/pem/google.pem")
+    aosp_ec_public_key = load_public_key_from_file("res/pem/aosp_ec.pem")
+    aosp_rsa_public_key = load_public_key_from_file("res/pem/aosp_rsa.pem")
+    knox_public_key = load_public_key_from_file("res/pem/knox.pem")
+    if compare_keys(root_public_key, google_public_key):
+        reply += "\n✅ Google hardware attestation root certificate"
+    elif compare_keys(root_public_key, aosp_ec_public_key):
+        reply += "\n🟡 AOSP software attestation root certificate (EC)"
+    elif compare_keys(root_public_key, aosp_rsa_public_key):
+        reply += "\n🟡 AOSP software attestation root certificate (RSA)"
+    elif compare_keys(root_public_key, knox_public_key):
+        reply += "\n✅ Samsung Knox attestation root certificate"
+    else:
+        reply += "\n❌ Unknown root certificate"
 
     # Validation of certificate revocation
     try:
