@@ -102,7 +102,7 @@ async def keybox_check(bot, message, document):
     # Certificate Validity Verification
     serial_number = certificate.serial_number
     serial_number_string = hex(serial_number)[2:].lower()
-    reply = f"*Serial number:* `{serial_number_string}`"
+    reply = f"🔐 *Serial number:* `{serial_number_string}`"
     not_valid_before = certificate.not_valid_before
     not_valid_after = certificate.not_valid_after
     current_time = datetime.utcnow()
@@ -186,6 +186,6 @@ async def keybox_check(bot, message, document):
     if status is None:
         reply += "\n✅ Serial number not found in Google's revoked keybox list"
     else:
-        reply += f"\n❌ Serial number found in Google's revoked keybox list\n*Reason:* `{status['reason']}`"
+        reply += f"\n❌ Serial number found in Google's revoked keybox list\n🔍 *Reason:* `{status['reason']}`"
 
     await bot.reply_to(message, reply, parse_mode='Markdown')
