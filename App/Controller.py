@@ -2,15 +2,13 @@ import asyncio
 import telebot
 import re
 import time
-import psutil
-import platform
-from datetime import datetime, timedelta, timezone
 from loguru import logger
+from datetime import datetime, timedelta, timezone
 from telebot import util, types
 from telebot.async_telebot import AsyncTeleBot
 from telebot.asyncio_storage import StateMemoryStorage
 from telebot.asyncio_filters import SimpleCustomFilter, AdvancedCustomFilter
-from App import Event, PingBot, CmdLockBot, NewsBot, KeyboxBot
+from App import Event, PingBot, CmdLockBot, NewsBot, KeyboxBot, RankBot
 
 
 class BotRunner(object):
@@ -35,29 +33,7 @@ class BotRunner(object):
 
         @bot.message_handler(user_id=self.config.bot["master"], commands=['info'])
         async def handle_info(message):
-            os_info = platform.platform()
-            cpu_usage = psutil.cpu_percent(interval=1)
-            memory_info = psutil.virtual_memory()
-            swap_info = psutil.swap_memory()
-            disk_info = psutil.disk_usage('/')
-            net_io = psutil.net_io_counters()
-            load_avg = psutil.getloadavg()
-
-            info_message = (
-                f"*Operating System:* `{os_info}`\n"
-                f"*CPU Usage:* `{cpu_usage}%`\n"
-                f"*Memory Usage:* `{memory_info.percent}% (Total: {memory_info.total / (1024 ** 3):.2f} GB, "
-                f"Used: {memory_info.used / (1024 ** 3):.2f} GB)`\n"
-                f"*Swap Usage:* `{swap_info.percent}% (Total: {swap_info.total / (1024 ** 3):.2f} GB, "
-                f"Used: {swap_info.used / (1024 ** 3):.2f} GB)`\n"
-                f"*Disk Usage:* `{disk_info.percent}% (Total: {disk_info.total / (1024 ** 3):.2f} GB, "
-                f"Used: {disk_info.used / (1024 ** 3):.2f} GB)`\n"
-                f"*Network I/O:* `Sent: {net_io.bytes_sent / (1024 ** 2):.2f} MB, "
-                f"Received: {net_io.bytes_recv / (1024 ** 2):.2f} MB`\n"
-                f"*Load Average:* `1 min: {load_avg[0]:.2f}, 5 min: {load_avg[1]:.2f}, 15 min: {load_avg[2]:.2f}`"
-            )
-
-            await bot.reply_to(message, info_message, parse_mode='Markdown')
+            await Event.handle_info(bot, message)
 
         @bot.message_handler(commands=['calldoctor', 'callmtf', 'callpolice'])
         async def call_anyone(message):
@@ -79,11 +55,11 @@ class BotRunner(object):
 
         @bot.message_handler(commands=['t'], chat_types=['group', 'supergroup'])
         async def handle_appellation(message):
-            await Event.appellation(bot, message, self.bot_id)
+            await RankBot.appellation(bot, message, self.bot_id)
 
         @bot.message_handler(commands=['td'], chat_types=['group', 'supergroup'])
         async def handle_appellation(message):
-            await Event.appellation_demote(bot, message, self.bot_id)
+            await RankBot.appellation_demote(bot, message, self.bot_id)
 
         @bot.message_handler(commands=["short"])
         async def handle_command(message):
@@ -225,7 +201,7 @@ class BotRunner(object):
                 if command in lock_cmd_list:
                     await bot.delete_message(message.chat.id, message.message_id)
 
-        @bot.message_handler(user_id=self.config.xiatou["id"], content_types=['text', 'photo', 'video', 'document'])
+        @bot.message_handler(func=lambda message: message.from_user.id in self.config.xiatou["id"])
         async def handle_xiatou(message):
             count_db = self.db.get("inb")
             if count_db is None:
@@ -240,6 +216,19 @@ class BotRunner(object):
                 count_db[1] += 1
                 self.db.set("inb", count_db)
 
+        @bot.message_handler(func=lambda message: message.chat.id in self.config.magic["group"]
+                             and message.text in self.config.magic["text"])
+        async def handle_group_message(message):
+            await bot.delete_message(message.chat.id, message.message_id)
+
+        @bot.chat_join_request_handler(func=lambda message: message.chat.id in self.config.magic["channel"])
+        async def handle_channel_join_request(request):
+            chat_member = await bot.get_chat_member(self.config.magic["white_group"], request.from_user.id)
+            if chat_member.status in ['member', 'administrator', 'creator']:
+                await bot.approve_chat_join_request(request.chat.id, request.from_user.id)
+            else:
+                await bot.decline_chat_join_request(request.chat.id, request.from_user.id)
+
         @bot.inline_handler(lambda query: True)
         async def send_photo(query):
             await Event.inline_message(bot, query)
@@ -250,7 +239,6 @@ class BotRunner(object):
         bot.add_custom_filter(asyncio_filters.StateFilter(bot))
         bot.add_custom_filter(StartsWithFilter())
         bot.add_custom_filter(CommandInChatFilter())
-        bot.add_custom_filter(UserFilter())
 
         async def main():
             await asyncio.gather(bot.polling(non_stop=True, allowed_updates=util.update_types))
@@ -270,10 +258,3 @@ class CommandInChatFilter(SimpleCustomFilter):
 
     async def check(self, message):
         return message.chat.type in ['group', 'supergroup'] and message.text.startswith('/')
-
-
-class UserFilter(AdvancedCustomFilter):
-    key = 'user_id'
-
-    async def check(self, message, text):
-        return message.from_user.id in text

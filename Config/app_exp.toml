@@ -18,3 +18,9 @@ white_list = [-100123456789,-100987654321]
 id = [123,456]
 cloudflare_account_id= "123456789"
 cloudflare_auth_token= "123456789"
+
+[magic]
+group = [-100123456789,-100987654321]
+text = ["Example1", "Example2"]
+channel = [-100123456789,-100987654321]
+white_group = -100123456789
