@@ -103,6 +103,7 @@ async def keybox_check(bot, message, document):
     serial_number = certificate.serial_number
     serial_number_string = hex(serial_number)[2:].lower()
     reply = f"🔐 *Serial number:* `{serial_number_string}`"
+    reply += f"\nℹ️ *Subject:* `{certificate.subject}`"
     not_valid_before = certificate.not_valid_before
     not_valid_after = certificate.not_valid_after
     current_time = datetime.utcnow()
@@ -118,15 +119,15 @@ async def keybox_check(bot, message, document):
     flag = True
     for i in range(pem_number - 1):
         son_certificate = x509.load_pem_x509_certificate(pem_certificates[i].encode(), default_backend())
-        mother_certificate = x509.load_pem_x509_certificate(pem_certificates[i + 1].encode(), default_backend())
+        father_certificate = x509.load_pem_x509_certificate(pem_certificates[i + 1].encode(), default_backend())
 
-        if son_certificate.issuer != mother_certificate.subject:
+        if son_certificate.issuer != father_certificate.subject:
             flag = False
             break
         signature = son_certificate.signature
         signature_algorithm = son_certificate.signature_algorithm_oid._name
         tbs_certificate = son_certificate.tbs_certificate_bytes
-        public_key = mother_certificate.public_key()
+        public_key = father_certificate.public_key()
         try:
             if signature_algorithm in ['sha256WithRSAEncryption', 'sha1WithRSAEncryption', 'sha384WithRSAEncryption',
                                        'sha512WithRSAEncryption']:
