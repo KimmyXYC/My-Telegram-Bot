@@ -216,19 +216,6 @@ class BotRunner(object):
                 count_db[1] += 1
                 self.db.set("inb", count_db)
 
-        @bot.message_handler(func=lambda message: message.chat.id in self.config.magic["group"]
-                             and message.text in self.config.magic["text"])
-        async def handle_group_message(message):
-            await bot.delete_message(message.chat.id, message.message_id)
-
-        @bot.chat_join_request_handler(func=lambda message: message.chat.id in self.config.magic["channel"])
-        async def handle_channel_join_request(request):
-            chat_member = await bot.get_chat_member(self.config.magic["white_group"], request.from_user.id)
-            if chat_member.status in ['member', 'administrator', 'creator']:
-                await bot.approve_chat_join_request(request.chat.id, request.from_user.id)
-            else:
-                await bot.decline_chat_join_request(request.chat.id, request.from_user.id)
-
         @bot.inline_handler(lambda query: True)
         async def send_photo(query):
             await Event.inline_message(bot, query)
