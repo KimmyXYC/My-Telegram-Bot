@@ -87,6 +87,9 @@ class BotRunner(object):
 
         @bot.message_handler(commands=["short"])
         async def handle_command(message):
+            white_list = self.config.shorturl["white_list"]
+            if message.chat.id not in white_list and message.from_user.id not in white_list:
+                return
             command_args = message.text.split()
             if len(command_args) == 1:
                 await bot.reply_to(message, "格式错误, 格式应为 /short [URL] (short)")
