@@ -104,10 +104,11 @@ async def keybox_check(bot, message, document):
     serial_number_string = hex(serial_number)[2:].lower()
     reply = f"🔐 *Serial number:* `{serial_number_string}`"
     subject = certificate.subject
-    reply += f"\nℹ️ *Subject:* "
+    reply += f"\nℹ️ *Subject:* `"
     for rdn in subject:
         reply += f"{rdn.oid._name}={rdn.value}, "
     reply = reply[:-2]
+    reply += "`"
     not_valid_before = certificate.not_valid_before
     not_valid_after = certificate.not_valid_after
     current_time = datetime.utcnow()
