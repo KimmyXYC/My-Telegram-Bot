@@ -8,7 +8,8 @@ from telebot import util, types
 from telebot.async_telebot import AsyncTeleBot
 from telebot.asyncio_storage import StateMemoryStorage
 from telebot.asyncio_filters import SimpleCustomFilter, AdvancedCustomFilter
-from App import Event, PingBot, CmdLockBot, NewsBot, KeyboxBot, RankBot
+from App import Event, PingBot, CmdLockBot, NewsBot, KeyboxBot, RankBot, RemakeBot
+from Utils.Tool import get_csv_data_list
 
 
 class BotRunner(object):
@@ -18,6 +19,7 @@ class BotRunner(object):
         self.config = config
         self.db = db
         self.bot_id = int(self.bot.botToken.split(':')[0])
+        self.rd_data, self.rd_weights = get_csv_data_list()
 
     def botcreate(self):
         bot = AsyncTeleBot(self.bot.botToken, state_storage=StateMemoryStorage())
@@ -38,6 +40,23 @@ class BotRunner(object):
         @bot.message_handler(commands=['calldoctor', 'callmtf', 'callpolice'])
         async def call_anyone(message):
             await Event.call_anyone(bot, message)
+
+        @bot.message_handler(commands=['remake'])
+        async def handle_remake(message):
+            count_db = self.db.get(f"remake_{message.from_user.id}")
+            if count_db is None:
+                count_db = ["", "", 0]
+            country_choice, sex_choice = await RemakeBot.remake(bot, message, self.rd_data, self.rd_weights)
+            count_db = [country_choice, sex_choice, count_db[2] + 1]
+            self.db.set(f"remake_{message.from_user.id}", count_db)
+
+        @bot.message_handler(commands=['remake_data'])
+        async def handle_remake_data(message):
+            count_db = self.db.get(f"remake_{message.from_user.id}")
+            if count_db is None:
+                await bot.reply_to(message, "您还没有 remake 过呢，快 /remake 吧")
+            else:
+                await bot.reply_to(message, f"您现在是 {count_db[0]} 的 {count_db[1]}，共 remake 了 {count_db[2]} 次")
 
         @bot.message_handler(commands=['check'])
         async def handle_keybox_check(message):
