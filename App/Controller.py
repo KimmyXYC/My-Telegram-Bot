@@ -33,7 +33,7 @@ class BotRunner(object):
             asyncio_helper.proxy = self.proxy.url
             logger.success("Proxy Set")
 
-        @bot.message_handler(user_id=self.config.bot["master"], commands=['info'])
+        @bot.message_handler(func=lambda message: message.from_user.id in self.config.bot["master"], commands=['info'])
         async def handle_info(message):
             await Event.handle_info(bot, message)
 
