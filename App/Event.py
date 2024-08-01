@@ -122,14 +122,14 @@ async def handle_xiatou(bot, message, count, config):
         text_content = message.caption
         if text_content is None:
             return False
-    pattern = r"(?:舔|嗦|啃|舔舐|舔舔|舔舐|吻|嘬)(?:(?:萝莉|幼女|云漓|克拉拉|小格雷修)(?:的)?(?:脚|jio|足|狱卒|嫩足|脚丫子|脚丫|脚趾头|玉足|裸足))|(?:萝莉|幼女|云漓|克拉拉|小格雷修)\s*(?:脚|jio|足|狱卒|嫩足|脚丫子|脚丫|脚趾头|玉足|裸足)\s*(?:给我|放进|想|感觉|看着)|.*(?:jio|狱卒|玉足|脚丫|脚丫子|脚趾|脚趾头|嫩足|裸足|小脚|小足|脚板|脚掌|脚背|足尖|脚丫丫).*|(?: .*放我嘴里.*)"
+    pattern = r".*(?:jio|狱卒|玉足|脚丫|脚丫子|脚趾|脚趾头|嫩足|裸足|小脚|小足|脚板|脚掌|脚背|足尖|脚丫丫|放我嘴里|塞我嘴里).*"
     if re.search(pattern, text_content, re.IGNORECASE):
         logger.info(f"[XiaTou][{message.chat.id}]: {text_content}")
         logger.success(f"[XiaTou][{message.chat.id}]: Regular Match Success")
         await bot.reply_to(message, f"#下头\ninb 老师，这是你今天第 {count+1} 次下头")
         return True
     else:
-        pattern = r".*(?:脚|足|萝莉).*"
+        pattern = r".*(?:脚|足|舔|嘴里|萝莉).*"
         if re.search(pattern, text_content, re.IGNORECASE):
             url = f"https://api.cloudflare.com/client/v4/accounts/{config['cloudflare_account_id']}/ai/run/@cf/qwen/qwen1.5-14b-chat-awq"
             headers = {
@@ -145,6 +145,7 @@ async def handle_xiatou(bot, message, count, config):
                         "role": "user",
                         "content": message.text
                     }
+
                 ]
             }
             async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10)) as session:

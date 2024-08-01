@@ -230,7 +230,8 @@ class BotRunner(object):
                 if command in lock_cmd_list:
                     await bot.delete_message(message.chat.id, message.message_id)
 
-        @bot.message_handler(func=lambda message: message.from_user.id in self.config.xiatou["id"])
+        @bot.message_handler(func=lambda message: message.from_user.id in self.config.xiatou["id"],
+                             content_types=['text', 'photo', 'video', 'document'])
         async def handle_xiatou(message):
             count_db = self.db.get("inb")
             if count_db is None:
