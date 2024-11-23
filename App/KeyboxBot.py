@@ -189,7 +189,7 @@ async def keybox_check(bot, message, document):
 
     # Number of Certificates in Keychain
     if pem_number >= 4:
-        reply += "🟡 *Warning:* More than 3 certificates in the keychain"
+        reply += "\n🟡 *Warning:* More than 3 certificates in the keychain"
 
     # Validation of certificate revocation
     try:
