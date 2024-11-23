@@ -6,6 +6,7 @@
 import aiohttp
 import json
 import tempfile
+import time
 import xml.etree.ElementTree as ET
 from loguru import logger
 from datetime import datetime
@@ -24,8 +25,12 @@ async def load_from_url():
         "Expires": "0"
     }
 
+    params = {
+        "ts": int(time.time())
+    }
+
     async with aiohttp.ClientSession() as session:
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url, headers=headers, params=params) as response:
             if response.status != 200:
                 raise Exception(f"Error fetching data: {response.status}")
             return await response.json()
