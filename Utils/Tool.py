@@ -13,7 +13,7 @@ def remove_emoji(string):
 
 
 def get_csv_data_list():
-    df = pd.read_csv('res/csv/data.csv', encoding='GBK')
+    df = pd.read_csv('res/csv/data.csv', encoding='utf-8')
 
     country_list = df['Country'].tolist()
     weight_list = df['Weight'].tolist()
